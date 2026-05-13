@@ -3,130 +3,239 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>법정의무교육 비디오 플레이어 테스트</title>
+    <title>OneLearn Player</title>
 
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
     <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
   </head>
 
   <body>
-    <main class="page">
-      <section class="hero">
-        <p class="eyebrow">LMS Video Player MVP</p>
-        <h1>법정의무교육 비디오 플레이어 테스트</h1>
-        <p class="subtitle">
-          Cloudflare R2 영상을 커스텀 플레이어로 재생하고, 빨리감기 차단 /
-          배속 허용 / 시청 로그를 테스트합니다.
-        </p>
+    <div class="ol-noise"></div>
+    <div class="ol-glow ol-glow-a"></div>
+    <div class="ol-glow ol-glow-b"></div>
+
+    <main class="ol-shell">
+      <header class="ol-topbar">
+        <div class="ol-brand">
+          <div class="ol-logo-mark">1</div>
+          <div>
+            <p class="ol-brand-kicker">OneLearn</p>
+            <h1 id="courseTitle">강의 불러오는 중...</h1>
+          </div>
+        </div>
+
+        <div class="ol-top-actions">
+          <span id="courseStatusBadge" class="ol-badge">READY</span>
+          <button id="resetUserBtn" class="ol-ghost-btn" type="button">
+            사용자 변경
+          </button>
+        </div>
+      </header>
+
+      <section class="ol-hero">
+        <div>
+          <p class="ol-eyebrow">LMS Video Player Engine</p>
+          <h2 id="courseHeadline">틀어놓는 교육이 아니라, 증명되는 학습으로.</h2>
+          <p id="courseSubtitle" class="ol-subtitle">
+            챕터별 시청기록, 배속 정책, 본인확인, 수료조건까지 제어합니다.
+          </p>
+        </div>
+
+        <div class="ol-course-progress-card">
+          <div class="ol-ring" id="courseRing">
+            <span id="courseProgressNumber">0%</span>
+          </div>
+          <div>
+            <p class="ol-card-label">강의 전체 진도</p>
+            <strong id="courseProgressText">0% 완료</strong>
+            <span id="courseCompleteText">아직 수료 전입니다.</span>
+          </div>
+        </div>
       </section>
 
-      <section class="layout">
-        <section class="player-card">
-          <div class="video-header">
-            <div>
-              <p class="label">현재 강의</p>
-              <h2 id="videoTitle">영상 불러오는 중...</h2>
+      <section class="ol-grid">
+        <aside class="ol-sidebar">
+          <div class="ol-panel">
+            <div class="ol-panel-head">
+              <div>
+                <p class="ol-card-label">Course Chapters</p>
+                <h3>챕터 목록</h3>
+              </div>
+              <span id="chapterCountBadge" class="ol-mini-badge">0개</span>
             </div>
-            <span id="statusBadge" class="badge">READY</span>
+
+            <div id="chapterList" class="ol-chapter-list"></div>
           </div>
 
-          <div class="video-wrap">
-            <video id="trainingVideo" preload="metadata" playsinline>
-              브라우저가 video 태그를 지원하지 않습니다.
-            </video>
+          <div class="ol-panel ol-policy-panel">
+            <p class="ol-card-label">Active Policy</p>
+            <h3>현재 챕터 정책</h3>
+            <ul id="policyList" class="ol-policy-list"></ul>
+          </div>
+        </aside>
 
-            <div id="identityOverlay" class="identity-overlay hidden">
-              <div class="identity-box">
-                <h3>수강 확인</h3>
-                <p>계속 수강 중이면 아래 버튼을 눌러주세요.</p>
-                <button id="confirmIdentityBtn" class="primary-btn">
-                  계속 수강하기
-                </button>
+        <section class="ol-player-area">
+          <div class="ol-player-card">
+            <div class="ol-video-head">
+              <div>
+                <p class="ol-card-label">Now Learning</p>
+                <h3 id="chapterTitle">챕터 불러오는 중...</h3>
+                <p id="chapterDescription" class="ol-chapter-desc"></p>
+              </div>
+              <span id="chapterStatusBadge" class="ol-badge">LOADING</span>
+            </div>
+
+            <div class="ol-video-frame">
+              <video id="trainingVideo" preload="metadata" playsinline>
+                브라우저가 video 태그를 지원하지 않습니다.
+              </video>
+
+              <div id="loadingOverlay" class="ol-loading-overlay">
+                <div class="ol-loader"></div>
+                <p>영상 준비 중...</p>
+              </div>
+
+              <div id="identityOverlay" class="ol-identity-overlay hidden">
+                <div class="ol-identity-box">
+                  <p class="ol-eyebrow">Learning Check</p>
+                  <h3>계속 수강 중인가요?</h3>
+                  <p>
+                    학습 이력의 신뢰성을 위해 수강 상태를 확인합니다.
+                    계속 수강 중이면 아래 버튼을 눌러주세요.
+                  </p>
+                  <button id="confirmIdentityBtn" class="ol-primary-btn" type="button">
+                    계속 수강하기
+                  </button>
+                </div>
+              </div>
+
+              <div id="completionOverlay" class="ol-completion-overlay hidden">
+                <div class="ol-completion-box">
+                  <p class="ol-eyebrow">Chapter Complete</p>
+                  <h3>챕터 학습 완료</h3>
+                  <p id="completionMessage">다음 챕터로 이동할 수 있습니다.</p>
+                  <button id="nextChapterBtn" class="ol-primary-btn" type="button">
+                    다음 챕터로 이동
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="progress-area">
-            <div class="progress-meta">
+            <div class="ol-time-row">
               <span id="timeText">00:00 / 00:00</span>
-              <span id="progressText">진도율 0%</span>
+              <span id="progressText">챕터 진도 0%</span>
             </div>
 
-            <div class="progress-track">
-              <div id="progressBar" class="progress-bar"></div>
+            <div class="ol-progress-track">
+              <div id="progressBar" class="ol-progress-bar"></div>
             </div>
 
-            <p class="hint">
-              재생바는 표시 전용입니다. 앞으로 이동은 차단하고, 뒤로가기는 허용합니다.
-            </p>
-          </div>
+            <div class="ol-control-row">
+              <button id="playPauseBtn" class="ol-primary-btn" type="button">
+                재생
+              </button>
 
-          <div class="controls">
-            <button id="playPauseBtn" class="primary-btn" type="button">
-              재생
-            </button>
+              <button id="backBtn" class="ol-secondary-btn" type="button">
+                -10초
+              </button>
 
-            <button id="backBtn" class="secondary-btn" type="button">
-              -10초
-            </button>
+              <label class="ol-speed-control">
+                <span>배속</span>
+                <select id="speedSelect"></select>
+              </label>
 
-            <label class="speed-control">
-              배속
-              <select id="speedSelect">
-                <option value="0.75">0.75x</option>
-                <option value="1" selected>1.0x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="1.75">1.75x</option>
-                <option value="2">2.0x</option>
-              </select>
-            </label>
+              <button id="fullscreenBtn" class="ol-secondary-btn" type="button">
+                전체화면
+              </button>
+            </div>
 
-            <button id="fullscreenBtn" class="secondary-btn" type="button">
-              전체화면
-            </button>
-          </div>
-
-          <div class="test-tools">
-            <button id="simulateSeekBtn" class="danger-btn" type="button">
-              테스트: 강제로 60초 앞으로 이동 시도
-            </button>
-
-            <button id="clearLogBtn" class="secondary-btn" type="button">
-              로그 초기화
-            </button>
+            <div class="ol-test-row">
+              <button id="simulateSeekBtn" class="ol-danger-btn" type="button">
+                테스트: 60초 앞으로 이동 시도
+              </button>
+              <button id="clearLogBtn" class="ol-secondary-btn" type="button">
+                로그 초기화
+              </button>
+            </div>
           </div>
         </section>
 
-        <aside class="log-card">
-          <div class="log-header">
-            <div>
-              <p class="label">Local Watch Log</p>
-              <h2>시청 로그</h2>
+        <aside class="ol-log-area">
+          <div class="ol-panel">
+            <div class="ol-panel-head">
+              <div>
+                <p class="ol-card-label">Learning Evidence</p>
+                <h3>학습 기록</h3>
+              </div>
+              <span id="eventCountBadge" class="ol-mini-badge">0</span>
             </div>
+
+            <dl class="ol-stats">
+              <div>
+                <dt>실제 재생 시간</dt>
+                <dd id="actualWatchText">0초</dd>
+              </div>
+              <div>
+                <dt>최대 시청 위치</dt>
+                <dd id="maxPositionText">0초</dd>
+              </div>
+              <div>
+                <dt>차단된 이동</dt>
+                <dd id="blockedSeekText">0회</dd>
+              </div>
+              <div>
+                <dt>본인확인</dt>
+                <dd id="identityText">0회</dd>
+              </div>
+            </dl>
+
+            <pre id="logOutput" class="ol-log-output">로그 대기 중...</pre>
           </div>
-
-          <dl class="stats">
-            <div>
-              <dt>실제 재생 시간</dt>
-              <dd id="actualWatchText">0초</dd>
-            </div>
-
-            <div>
-              <dt>최대 시청 위치</dt>
-              <dd id="maxPositionText">0초</dd>
-            </div>
-
-            <div>
-              <dt>차단된 seek</dt>
-              <dd id="blockedSeekText">0회</dd>
-            </div>
-          </dl>
-
-          <pre id="logOutput" class="log-output">로그 대기 중...</pre>
         </aside>
       </section>
     </main>
 
-    <script src="./app.js"></script>
+    <div id="userModal" class="ol-user-modal">
+      <div class="ol-user-box">
+        <p class="ol-eyebrow">Welcome to OneLearn</p>
+        <h2>수강자 정보를 입력해주세요</h2>
+        <p>
+          현재 단계에서는 로그인 대신 수강자 정보를 로컬에 저장해
+          학습 기록과 연결합니다.
+        </p>
+
+        <form id="userForm" class="ol-user-form">
+          <label>
+            이름
+            <input id="userNameInput" type="text" placeholder="예: 정호준" required />
+          </label>
+
+          <label>
+            이메일
+            <input id="userEmailInput" type="email" placeholder="name@company.com" required />
+          </label>
+
+          <label>
+            부서
+            <input id="userDeptInput" type="text" placeholder="예: HRD팀" />
+          </label>
+
+          <label>
+            사번
+            <input id="userNoInput" type="text" placeholder="선택 입력" />
+          </label>
+
+          <button class="ol-primary-btn" type="submit">
+            학습 시작하기
+          </button>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
