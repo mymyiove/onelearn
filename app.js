@@ -1,89 +1,84 @@
-const video = document.getElementById("trainingVideo");
-const videoTitle = document.getElementById("videoTitle");
-const statusBadge = document.getElementById("statusBadge");
+const COURSE_URL = "./data/course.json";
+const STORAGE_PREFIX = "onelearn-mvp-02";
 
-const playPauseBtn = document.getElementById("playPauseBtn");
-const backBtn = document.getElementById("backBtn");
-const speedSelect = document.getElementById("speedSelect");
-const fullscreenBtn = document.getElementById("fullscreenBtn");
+const els = {
+  courseTitle: document.getElementById("courseTitle"),
+  courseHeadline: document.getElementById("courseHeadline"),
+  courseSubtitle: document.getElementById("courseSubtitle"),
+  courseStatusBadge: document.getElementById("courseStatusBadge"),
+  courseProgressNumber: document.getElementById("courseProgressNumber"),
+  courseProgressText: document.getElementById("courseProgressText"),
+  courseCompleteText: document.getElementById("courseCompleteText"),
+  courseRing: document.getElementById("courseRing"),
+  chapterCountBadge: document.getElementById("chapterCountBadge"),
+  chapterList: document.getElementById("chapterList"),
+  policyList: document.getElementById("policyList"),
+  chapterTitle: document.getElementById("chapterTitle"),
+  chapterDescription: document.getElementById("chapterDescription"),
+  chapterStatusBadge: document.getElementById("chapterStatusBadge"),
+  video: document.getElementById("trainingVideo"),
+  loadingOverlay: document.getElementById("loadingOverlay"),
+  identityOverlay: document.getElementById("identityOverlay"),
+  completionOverlay: document.getElementById("completionOverlay"),
+  completionMessage: document.getElementById("completionMessage"),
+  nextChapterBtn: document.getElementById("nextChapterBtn"),
+  timeText: document.getElementById("timeText"),
+  progressText: document.getElementById("progressText"),
+  progressBar: document.getElementById("progressBar"),
+  playPauseBtn: document.getElementById("playPauseBtn"),
+  backBtn: document.getElementById("backBtn"),
+  speedSelect: document.getElementById("speedSelect"),
+  fullscreenBtn: document.getElementById("fullscreenBtn"),
+  simulateSeekBtn: document.getElementById("simulateSeekBtn"),
+  clearLogBtn: document.getElementById("clearLogBtn"),
+  actualWatchText: document.getElementById("actualWatchText"),
+  maxPositionText: document.getElementById("maxPositionText"),
+  blockedSeekText: document.getElementById("blockedSeekText"),
+  identityText: document.getElementById("identityText"),
+  logOutput: document.getElementById("logOutput"),
+  eventCountBadge: document.getElementById("eventCountBadge"),
+  userModal: document.getElementById("userModal"),
+  userForm: document.getElementById("userForm"),
+  userNameInput: document.getElementById("userNameInput"),
+  userEmailInput: document.getElementById("userEmailInput"),
+  userDeptInput: document.getElementById("userDeptInput"),
+  userNoInput: document.getElementById("userNoInput"),
+  resetUserBtn: document.getElementById("resetUserBtn"),
+  confirmIdentityBtn: document.getElementById("confirmIdentityBtn")
+};
 
-const timeText = document.getElementById("timeText");
-const progressText = document.getElementById("progressText");
-const progressBar = document.getElementById("progressBar");
+let course = null;
+let user = null;
+let currentChapterIndex = 0;
+let currentChapter = null;
+let currentPolicy = null;
 
-const actualWatchText = document.getElementById("actualWatchText");
-const maxPositionText = document.getElementById("maxPositionText");
-const blockedSeekText = document.getElementById("blockedSeekText");
-const logOutput = document.getElementById("logOutput");
+let logs = [];
+let progress = {};
 
-const simulateSeekBtn = document.getElementById("simulateSeekBtn");
-const clearLogBtn = document.getElementById("clearLogBtn");
-
-const identityOverlay = document.getElementById("identityOverlay");
-const confirmIdentityBtn = document.getElementById("confirmIdentityBtn");
-
-const STORAGE_KEY = "legal-video-player-test-log";
-
-let currentVideoMeta = null;
 let maxAllowedTime = 0;
 let lastValidTime = 0;
 let actualWatchSeconds = 0;
 let blockedSeekCount = 0;
+let identityPassedCount = 0;
+let identityCheckTargets = [];
+let identityCheckShownTargets = new Set();
 let lastTickAt = null;
-let identityCheckShown = false;
 let heartbeatTimer = null;
-let logs = loadLogs();
+let isRestoringSeek = false;
 
-function resolveVideoSrc(meta) {
-  return meta.src;
+function storageKey(name) {
+  const courseId = course?.courseId || "unknown-course";
+  const userId = user?.id || "anonymous";
+  return `${STORAGE_PREFIX}:${name}:${courseId}:${userId}`;
 }
 
-async function init() {
-  renderLogs();
-
-  try {
-    const response = await fetch("./data/videos.json", {
-      cache: "no-store",
-    });
-
-    const videos = await response.json();
-    currentVideoMeta = videos[0];
-
-    if (!currentVideoMeta) {
-      throw new Error("data/videos.json에 영상 데이터가 없습니다.");
-    }
-
-    const src = resolveVideoSrc(currentVideoMeta);
-
-    if (!src) {
-      throw new Error("영상 src가 없습니다.");
-    }
-
-    videoTitle.textContent = currentVideoMeta.title || "제목 없음";
-    video.src = src;
-    video.load();
-
-    console.log("VIDEO SRC:", src);
-
-    addLog("video_loaded", {
-      title: currentVideoMeta.title,
-      src,
-      instruction: "이 URL을 새 탭에서 열었을 때 영상이 바로 재생되거나 다운로드되어야 합니다.",
-    });
-
-    setStatus("LOADED");
-  } catch (error) {
-    videoTitle.textContent = "영상 로드 실패";
-    setStatus("ERROR");
-
-    addLog("error", {
-      message: error.message,
-    });
-  }
+function userStorageKey() {
+  return `${STORAGE_PREFIX}:user`;
 }
 
-function setStatus(status) {
-  statusBadge.textContent = status;
+function createId(prefix) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 function formatTime(seconds) {
@@ -101,66 +96,445 @@ function formatTime(seconds) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-function updateUi() {
-  const duration = video.duration || 0;
-  const current = video.currentTime || 0;
-  const progressRatio = duration > 0 ? current / duration : 0;
-  const progressPercent = Math.min(100, Math.max(0, progressRatio * 100));
-
-  timeText.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
-  progressText.textContent = `진도율 ${progressPercent.toFixed(1)}%`;
-  progressBar.style.width = `${progressPercent}%`;
-
-  actualWatchText.textContent = `${Math.floor(actualWatchSeconds)}초`;
-  maxPositionText.textContent = `${Math.floor(maxAllowedTime)}초`;
-  blockedSeekText.textContent = `${blockedSeekCount}회`;
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
 }
 
-function addLog(type, payload = {}) {
-  const log = {
-    type,
-    videoId: currentVideoMeta?.id || null,
-    position: Number(video.currentTime || 0).toFixed(2),
-    maxAllowedTime: Number(maxAllowedTime || 0).toFixed(2),
-    playbackRate: video.playbackRate || 1,
-    actualWatchSeconds: Math.floor(actualWatchSeconds),
-    createdAt: new Date().toISOString(),
-    payload,
+function percent(value) {
+  return `${Math.round(value)}%`;
+}
+
+function mergePolicy(coursePolicy, chapterPolicy) {
+  return {
+    ...coursePolicy,
+    ...chapterPolicy
   };
+}
 
-  logs.unshift(log);
-  logs = logs.slice(0, 80);
+function loadUser() {
+  try {
+    const raw = localStorage.getItem(userStorageKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-  renderLogs();
+function saveUser(nextUser) {
+  localStorage.setItem(userStorageKey(), JSON.stringify(nextUser));
+}
+
+function showUserModal() {
+  els.userModal.classList.remove("hidden");
+}
+
+function hideUserModal() {
+  els.userModal.classList.add("hidden");
+}
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(storageKey("progress"));
+    progress = raw ? JSON.parse(raw) : {};
+  } catch {
+    progress = {};
+  }
+}
+
+function saveProgress() {
+  localStorage.setItem(storageKey("progress"), JSON.stringify(progress));
 }
 
 function loadLogs() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(storageKey("logs"));
+    logs = raw ? JSON.parse(raw) : [];
   } catch {
-    return [];
+    logs = [];
   }
 }
 
+function saveLogs() {
+  localStorage.setItem(storageKey("logs"), JSON.stringify(logs.slice(0, 160)));
+}
+
+function getChapterProgress(chapterId) {
+  if (!progress[chapterId]) {
+    progress[chapterId] = {
+      chapterId,
+      duration: 0,
+      maxAllowedTime: 0,
+      actualWatchSeconds: 0,
+      blockedSeekCount: 0,
+      identityPassedCount: 0,
+      completed: false,
+      completedAt: null,
+      lastPosition: 0,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  return progress[chapterId];
+}
+
+function addLog(type, payload = {}) {
+  const log = {
+    id: createId("evt"),
+    type,
+    userId: user?.id || null,
+    userName: user?.name || null,
+    userEmail: user?.email || null,
+    courseId: course?.courseId || null,
+    chapterId: currentChapter?.chapterId || null,
+    chapterTitle: currentChapter?.title || null,
+    position: Number(els.video.currentTime || 0).toFixed(2),
+    maxAllowedTime: Number(maxAllowedTime || 0).toFixed(2),
+    actualWatchSeconds: Math.floor(actualWatchSeconds),
+    playbackRate: els.video.playbackRate || 1,
+    createdAt: new Date().toISOString(),
+    payload
+  };
+
+  logs.unshift(log);
+  logs = logs.slice(0, 160);
+  saveLogs();
+  renderLogs();
+}
+
 function renderLogs() {
+  els.eventCountBadge.textContent = String(logs.length);
+
   if (!logs.length) {
-    logOutput.textContent = "로그 대기 중...";
+    els.logOutput.textContent = "로그 대기 중...";
     return;
   }
 
-  logOutput.textContent = JSON.stringify(logs, null, 2);
+  els.logOutput.textContent = JSON.stringify(logs.slice(0, 40), null, 2);
+}
+
+async function init() {
+  user = loadUser();
+
+  try {
+    const response = await fetch(COURSE_URL, { cache: "no-store" });
+    course = await response.json();
+
+    if (!course || !Array.isArray(course.chapters) || !course.chapters.length) {
+      throw new Error("course.json에 챕터 데이터가 없습니다.");
+    }
+
+    if (!user) {
+      showUserModal();
+    } else {
+      hideUserModal();
+    }
+
+    loadProgress();
+    loadLogs();
+
+    renderCourse();
+    loadChapter(0);
+    renderLogs();
+
+    addLog("course_loaded", {
+      chapterCount: course.chapters.length,
+      courseTitle: course.title
+    });
+  } catch (error) {
+    els.courseTitle.textContent = "강의 로드 실패";
+    els.chapterTitle.textContent = "강의 데이터를 불러오지 못했습니다.";
+    els.courseStatusBadge.textContent = "ERROR";
+    console.error(error);
+  }
+}
+
+function renderCourse() {
+  els.courseTitle.textContent = course.title || "OneLearn Course";
+  els.courseHeadline.textContent = course.brand?.tagline || "틀어놓는 교육이 아니라, 증명되는 학습으로.";
+  els.courseSubtitle.textContent = course.subtitle || "";
+  els.chapterCountBadge.textContent = `${course.chapters.length}개`;
+
+  renderChapterList();
+  updateCourseProgress();
+}
+
+function renderChapterList() {
+  els.chapterList.innerHTML = "";
+
+  course.chapters.forEach((chapter, index) => {
+    const state = getChapterProgress(chapter.chapterId);
+    const duration = state.duration || 0;
+    const ratio = duration > 0 ? clamp((state.maxAllowedTime / duration) * 100, 0, 100) : 0;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = [
+      "ol-chapter-item",
+      index === currentChapterIndex ? "active" : "",
+      state.completed ? "complete" : ""
+    ].join(" ").trim();
+
+    button.innerHTML = `
+      <span class="ol-chapter-number">CHAPTER ${String(index + 1).padStart(2, "0")}</span>
+      <span class="ol-chapter-name">${chapter.title}</span>
+      <div class="ol-chapter-progress"><span style="width:${ratio}%"></span></div>
+    `;
+
+    button.addEventListener("click", () => {
+      loadChapter(index);
+    });
+
+    els.chapterList.appendChild(button);
+  });
+}
+
+function loadChapter(index) {
+  currentChapterIndex = index;
+  currentChapter = course.chapters[index];
+  currentPolicy = mergePolicy(course.completionPolicy || {}, currentChapter.completionPolicy || {});
+
+  const state = getChapterProgress(currentChapter.chapterId);
+
+  maxAllowedTime = state.maxAllowedTime || 0;
+  lastValidTime = state.lastPosition || 0;
+  actualWatchSeconds = state.actualWatchSeconds || 0;
+  blockedSeekCount = state.blockedSeekCount || 0;
+  identityPassedCount = state.identityPassedCount || 0;
+  identityCheckShownTargets = new Set();
+
+  els.chapterTitle.textContent = currentChapter.title;
+  els.chapterDescription.textContent = currentChapter.description || "";
+  els.chapterStatusBadge.textContent = state.completed ? "COMPLETED" : "READY";
+  els.loadingOverlay.classList.remove("hidden");
+  els.identityOverlay.classList.add("hidden");
+  els.completionOverlay.classList.add("hidden");
+
+  els.video.pause();
+  els.video.src = currentChapter.src;
+  els.video.load();
+
+  renderSpeedOptions();
+  renderPolicy();
+  renderChapterList();
+  updateUi();
+
+  addLog("chapter_loaded", {
+    chapterIndex: index,
+    src: currentChapter.src,
+    policy: currentPolicy
+  });
+}
+
+function renderSpeedOptions() {
+  const allow = currentPolicy.allowPlaybackRate !== false;
+  const min = Number(currentPolicy.minPlaybackRate || 0.75);
+  const max = Number(currentPolicy.maxPlaybackRate || 2);
+
+  const baseRates = [0.75, 1, 1.25, 1.5, 1.75, 2];
+  const rates = baseRates.filter((rate) => rate >= min && rate <= max);
+
+  els.speedSelect.innerHTML = "";
+
+  rates.forEach((rate) => {
+    const option = document.createElement("option");
+    option.value = String(rate);
+    option.textContent = `${rate}x`;
+    if (rate === 1) option.selected = true;
+    els.speedSelect.appendChild(option);
+  });
+
+  els.speedSelect.disabled = !allow;
+  els.video.playbackRate = 1;
+}
+
+function renderPolicy() {
+  const items = [
+    ["배속", currentPolicy.allowPlaybackRate === false ? "비허용" : `허용, 최대 ${currentPolicy.maxPlaybackRate || 2}x`],
+    ["앞으로 이동", currentPolicy.preventForwardSeeking === false ? "허용" : "차단"],
+    ["챕터 진도 기준", `${currentPolicy.requiredProgressPercent || currentPolicy.requiredCourseProgressPercent || 95}%`],
+    ["실제 재생시간 기준", `${currentPolicy.requiredActualWatchPercent || 0}%`],
+    ["본인확인", `${currentPolicy.identityCheckCount || 0}회`],
+    ["수료 후 탐색", currentPolicy.allowSeekingAfterCompletion ? "허용" : "정책 유지"]
+  ];
+
+  els.policyList.innerHTML = items
+    .map(([label, value]) => `<li><span>${label}</span><strong>${value}</strong></li>`)
+    .join("");
+}
+
+function buildIdentityTargets(duration) {
+  const count = Number(currentPolicy.identityCheckCount || 0);
+  identityCheckTargets = [];
+
+  if (!duration || count <= 0) return;
+
+  for (let i = 1; i <= count; i += 1) {
+    const ratio = (i / (count + 1));
+    identityCheckTargets.push(Math.floor(duration * ratio));
+  }
+}
+
+function updateChapterState(extra = {}) {
+  if (!currentChapter) return;
+
+  const state = getChapterProgress(currentChapter.chapterId);
+
+  state.duration = els.video.duration || state.duration || 0;
+  state.maxAllowedTime = Math.max(state.maxAllowedTime || 0, maxAllowedTime || 0);
+  state.actualWatchSeconds = Math.max(state.actualWatchSeconds || 0, actualWatchSeconds || 0);
+  state.blockedSeekCount = blockedSeekCount;
+  state.identityPassedCount = identityPassedCount;
+  state.lastPosition = els.video.currentTime || state.lastPosition || 0;
+  state.updatedAt = new Date().toISOString();
+
+  Object.assign(state, extra);
+
+  progress[currentChapter.chapterId] = state;
+  saveProgress();
+}
+
+function evaluateChapterCompletion() {
+  const duration = els.video.duration || 0;
+  if (!duration || !currentChapter) return false;
+
+  const state = getChapterProgress(currentChapter.chapterId);
+  if (state.completed) return true;
+
+  const requiredProgress = Number(
+    currentPolicy.requiredProgressPercent ||
+    currentPolicy.requiredCourseProgressPercent ||
+    95
+  );
+
+  const requiredActual = Number(currentPolicy.requiredActualWatchPercent || 0);
+  const progressRatio = (maxAllowedTime / duration) * 100;
+  const actualRatio = (actualWatchSeconds / duration) * 100;
+  const requiredIdentity = Number(currentPolicy.identityCheckCount || 0);
+
+  const passed =
+    progressRatio >= requiredProgress &&
+    actualRatio >= requiredActual &&
+    identityPassedCount >= requiredIdentity;
+
+  if (passed) {
+    updateChapterState({
+      completed: true,
+      completedAt: new Date().toISOString()
+    });
+
+    els.chapterStatusBadge.textContent = "COMPLETED";
+    showCompletionOverlay();
+    addLog("chapter_completed", {
+      progressRatio,
+      actualRatio,
+      requiredProgress,
+      requiredActual,
+      identityPassedCount
+    });
+
+    renderChapterList();
+    updateCourseProgress();
+  }
+
+  return passed;
+}
+
+function updateCourseProgress() {
+  if (!course) return;
+
+  const chapters = course.chapters || [];
+  if (!chapters.length) return;
+
+  let totalRatio = 0;
+  let completedCount = 0;
+
+  chapters.forEach((chapter) => {
+    const state = getChapterProgress(chapter.chapterId);
+    const duration = state.duration || 0;
+    const ratio = duration > 0 ? clamp((state.maxAllowedTime / duration) * 100, 0, 100) : 0;
+    totalRatio += ratio;
+    if (state.completed) completedCount += 1;
+  });
+
+  const courseRatio = totalRatio / chapters.length;
+  const requiredCourseProgress = Number(course.completionPolicy?.requiredCourseProgressPercent || 95);
+  const requireAll = course.completionPolicy?.requireAllChaptersCompleted !== false;
+
+  const courseCompleted =
+    courseRatio >= requiredCourseProgress &&
+    (!requireAll || completedCount === chapters.length);
+
+  els.courseProgressNumber.textContent = percent(courseRatio);
+  els.courseProgressText.textContent = `${percent(courseRatio)} 완료`;
+  els.courseRing.style.setProperty("--progress", `${courseRatio}%`);
+
+  if (courseCompleted) {
+    els.courseCompleteText.textContent = "강의 수료 조건을 충족했습니다.";
+    els.courseStatusBadge.textContent = "COMPLETED";
+  } else {
+    els.courseCompleteText.textContent = `${completedCount}/${chapters.length}개 챕터 완료`;
+    els.courseStatusBadge.textContent = "IN PROGRESS";
+  }
+}
+
+function showCompletionOverlay() {
+  const hasNext = currentChapterIndex < course.chapters.length - 1;
+
+  els.completionMessage.textContent = hasNext
+    ? "다음 챕터로 이동할 수 있습니다."
+    : "모든 챕터 학습 상태를 확인했습니다.";
+
+  els.nextChapterBtn.textContent = hasNext ? "다음 챕터로 이동" : "강의 진도 확인";
+  els.completionOverlay.classList.remove("hidden");
+}
+
+function updateUi() {
+  const duration = els.video.duration || 0;
+  const current = els.video.currentTime || 0;
+  const chapterRatio = duration > 0 ? clamp((maxAllowedTime / duration) * 100, 0, 100) : 0;
+
+  els.timeText.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+  els.progressText.textContent = `챕터 진도 ${chapterRatio.toFixed(1)}%`;
+  els.progressBar.style.width = `${chapterRatio}%`;
+
+  els.actualWatchText.textContent = `${Math.floor(actualWatchSeconds)}초`;
+  els.maxPositionText.textContent = `${Math.floor(maxAllowedTime)}초`;
+  els.blockedSeekText.textContent = `${blockedSeekCount}회`;
+  els.identityText.textContent = `${identityPassedCount}회`;
+
+  updateChapterState();
+}
+
+function showIdentityCheck(target) {
+  els.video.pause();
+  els.identityOverlay.classList.remove("hidden");
+  identityCheckShownTargets.add(target);
+
+  addLog("identity_check_shown", {
+    target
+  });
+}
+
+function maybeShowIdentityCheck() {
+  if (!identityCheckTargets.length) return;
+
+  const current = els.video.currentTime || 0;
+
+  identityCheckTargets.forEach((target) => {
+    if (current >= target && !identityCheckShownTargets.has(target)) {
+      showIdentityCheck(target);
+    }
+  });
 }
 
 function startHeartbeat() {
   stopHeartbeat();
 
   heartbeatTimer = setInterval(() => {
-    if (!video.paused && !video.ended) {
+    if (!els.video.paused && !els.video.ended) {
       addLog("heartbeat", {
-        currentTime: video.currentTime,
-        duration: video.duration,
+        currentTime: els.video.currentTime,
+        duration: els.video.duration
       });
     }
   }, 15000);
@@ -173,167 +547,195 @@ function stopHeartbeat() {
   }
 }
 
-function showIdentityCheck() {
-  if (identityCheckShown) return;
+els.video.addEventListener("loadedmetadata", () => {
+  els.loadingOverlay.classList.add("hidden");
 
-  identityCheckShown = true;
-  video.pause();
-  identityOverlay.classList.remove("hidden");
+  const state = getChapterProgress(currentChapter.chapterId);
+  const duration = els.video.duration || 0;
 
-  addLog("identity_check_shown", {
-    reason: "sample_check_at_30_seconds",
-  });
-}
+  state.duration = duration;
+  buildIdentityTargets(duration);
 
-video.addEventListener("loadedmetadata", () => {
+  if (state.lastPosition && state.lastPosition < duration) {
+    els.video.currentTime = state.lastPosition;
+  }
+
   updateUi();
+  saveProgress();
 
   addLog("metadata_loaded", {
-    duration: video.duration,
-    videoWidth: video.videoWidth,
-    videoHeight: video.videoHeight,
+    duration,
+    videoWidth: els.video.videoWidth,
+    videoHeight: els.video.videoHeight
   });
 });
 
-video.addEventListener("canplay", () => {
-  setStatus("CAN PLAY");
+els.video.addEventListener("canplay", () => {
+  els.loadingOverlay.classList.add("hidden");
+  els.chapterStatusBadge.textContent = getChapterProgress(currentChapter.chapterId).completed
+    ? "COMPLETED"
+    : "CAN PLAY";
 
   addLog("canplay", {
-    duration: video.duration,
+    duration: els.video.duration
   });
 });
 
-video.addEventListener("play", () => {
+els.video.addEventListener("play", () => {
   lastTickAt = Date.now();
-  playPauseBtn.textContent = "일시정지";
-  setStatus("PLAYING");
+  els.playPauseBtn.textContent = "일시정지";
+  els.chapterStatusBadge.textContent = "PLAYING";
   startHeartbeat();
-
   addLog("play");
 });
 
-video.addEventListener("pause", () => {
-  playPauseBtn.textContent = "재생";
-  setStatus("PAUSED");
+els.video.addEventListener("pause", () => {
+  els.playPauseBtn.textContent = "재생";
+
+  if (!getChapterProgress(currentChapter.chapterId).completed) {
+    els.chapterStatusBadge.textContent = "PAUSED";
+  }
 
   addLog("pause");
 });
 
-video.addEventListener("ended", () => {
-  playPauseBtn.textContent = "재생";
-  setStatus("ENDED");
+els.video.addEventListener("ended", () => {
   stopHeartbeat();
+  maxAllowedTime = Math.max(maxAllowedTime, els.video.duration || 0);
+  updateUi();
+  evaluateChapterCompletion();
 
-  addLog("ended", {
-    completed: true,
-  });
+  addLog("ended");
 });
 
-video.addEventListener("timeupdate", () => {
+els.video.addEventListener("timeupdate", () => {
   const now = Date.now();
 
-  if (!video.paused && !video.seeking) {
+  if (!els.video.paused && !els.video.seeking) {
     if (lastTickAt) {
       const delta = (now - lastTickAt) / 1000;
-
       if (delta > 0 && delta < 3) {
         actualWatchSeconds += delta;
       }
     }
 
-    if (video.currentTime > maxAllowedTime) {
-      maxAllowedTime = video.currentTime;
+    if (els.video.currentTime > maxAllowedTime) {
+      maxAllowedTime = els.video.currentTime;
     }
 
-    lastValidTime = video.currentTime;
+    lastValidTime = els.video.currentTime;
   }
 
   lastTickAt = now;
 
-  if (video.currentTime >= 30 && !identityCheckShown) {
-    showIdentityCheck();
-  }
-
+  maybeShowIdentityCheck();
   updateUi();
+  evaluateChapterCompletion();
 });
 
-video.addEventListener("seeking", () => {
-  const attemptedTime = video.currentTime;
-  const seekTolerance = 2;
+els.video.addEventListener("seeking", () => {
+  if (isRestoringSeek) return;
 
-  if (attemptedTime > maxAllowedTime + seekTolerance) {
+  const state = getChapterProgress(currentChapter.chapterId);
+  const completed = state.completed;
+  const preventForward =
+    currentPolicy.preventForwardSeeking !== false &&
+    !(completed && currentPolicy.allowSeekingAfterCompletion);
+
+  if (!preventForward) {
+    addLog("seek_allowed", {
+      attemptedTime: els.video.currentTime,
+      reason: "policy_allowed"
+    });
+    return;
+  }
+
+  const attemptedTime = els.video.currentTime;
+  const tolerance = 2;
+
+  if (attemptedTime > maxAllowedTime + tolerance) {
     blockedSeekCount += 1;
+    isRestoringSeek = true;
 
-    const restoredTime = Math.max(0, lastValidTime || maxAllowedTime);
-    video.currentTime = restoredTime;
+    const restoredTime = Math.max(0, lastValidTime || maxAllowedTime || 0);
+    els.video.currentTime = restoredTime;
+
+    setTimeout(() => {
+      isRestoringSeek = false;
+    }, 120);
 
     addLog("seek_blocked", {
       attemptedTime,
       restoredTime,
-      maxAllowedTime,
+      maxAllowedTime
     });
   } else {
     addLog("seek_allowed", {
       attemptedTime,
+      reason: "within_watched_range"
     });
   }
 });
 
-video.addEventListener("ratechange", () => {
-  addLog("speed_changed", {
-    playbackRate: video.playbackRate,
+els.video.addEventListener("ratechange", () => {
+  const allow = currentPolicy.allowPlaybackRate !== false;
+  const maxRate = Number(currentPolicy.maxPlaybackRate || 2);
+  const minRate = Number(currentPolicy.minPlaybackRate || 0.75);
+
+  if (!allow) {
+    els.video.playbackRate = 1;
+    return;
+  }
+
+  if (els.video.playbackRate > maxRate) {
+    els.video.playbackRate = maxRate;
+  }
+
+  if (els.video.playbackRate < minRate) {
+    els.video.playbackRate = minRate;
+  }
+
+  addLog("rate_changed", {
+    playbackRate: els.video.playbackRate
   });
 });
 
-video.addEventListener("error", () => {
-  const error = video.error;
-
-  setStatus("VIDEO ERROR");
+els.video.addEventListener("error", () => {
+  els.loadingOverlay.classList.add("hidden");
+  els.chapterStatusBadge.textContent = "VIDEO ERROR";
 
   addLog("video_error", {
-    code: error?.code,
-    message: getVideoErrorMessage(error?.code),
-    currentSrc: video.currentSrc,
-    src: video.src,
+    code: els.video.error?.code,
+    currentSrc: els.video.currentSrc,
+    src: els.video.src
   });
 });
 
-function getVideoErrorMessage(code) {
-  const messages = {
-    1: "MEDIA_ERR_ABORTED: 사용자가 재생을 중단했습니다.",
-    2: "MEDIA_ERR_NETWORK: 네트워크 오류가 발생했습니다.",
-    3: "MEDIA_ERR_DECODE: 디코딩 오류가 발생했습니다.",
-    4: "MEDIA_ERR_SRC_NOT_SUPPORTED: 영상 URL 또는 형식을 지원하지 않습니다.",
-  };
-
-  return messages[code] || "알 수 없는 비디오 오류";
-}
-
-playPauseBtn.addEventListener("click", async () => {
+els.playPauseBtn.addEventListener("click", async () => {
   try {
-    if (video.paused) {
-      await video.play();
+    if (els.video.paused) {
+      await els.video.play();
     } else {
-      video.pause();
+      els.video.pause();
     }
   } catch (error) {
     addLog("play_failed", {
-      message: error.message,
+      message: error.message
     });
   }
 });
 
-backBtn.addEventListener("click", () => {
-  video.currentTime = Math.max(0, video.currentTime - 10);
+els.backBtn.addEventListener("click", () => {
+  els.video.currentTime = Math.max(0, els.video.currentTime - 10);
   addLog("back_10_seconds");
 });
 
-speedSelect.addEventListener("change", () => {
-  video.playbackRate = Number(speedSelect.value);
+els.speedSelect.addEventListener("change", () => {
+  els.video.playbackRate = Number(els.speedSelect.value);
 });
 
-fullscreenBtn.addEventListener("click", async () => {
-  const target = video.parentElement;
+els.fullscreenBtn.addEventListener("click", async () => {
+  const target = document.querySelector(".ol-video-frame");
 
   try {
     if (!document.fullscreenElement) {
@@ -345,65 +747,92 @@ fullscreenBtn.addEventListener("click", async () => {
     }
   } catch (error) {
     addLog("fullscreen_failed", {
-      message: error.message,
+      message: error.message
     });
   }
 });
 
-simulateSeekBtn.addEventListener("click", () => {
-  const attempted = video.currentTime + 60;
+els.simulateSeekBtn.addEventListener("click", () => {
+  const attempted = els.video.currentTime + 60;
+  addLog("simulate_forward_seek", { attempted });
+  els.video.currentTime = attempted;
+});
 
-  addLog("simulate_forward_seek", {
-    attempted,
+els.clearLogBtn.addEventListener("click", () => {
+  logs = [];
+  saveLogs();
+  renderLogs();
+  addLog("logs_cleared");
+});
+
+els.confirmIdentityBtn.addEventListener("click", async () => {
+  identityPassedCount += 1;
+  els.identityOverlay.classList.add("hidden");
+
+  updateChapterState({
+    identityPassedCount
   });
 
-  video.currentTime = attempted;
-});
-
-clearLogBtn.addEventListener("click", () => {
-  logs = [];
-  localStorage.removeItem(STORAGE_KEY);
-
-  actualWatchSeconds = 0;
-  maxAllowedTime = 0;
-  lastValidTime = 0;
-  blockedSeekCount = 0;
-  identityCheckShown = false;
-
-  identityOverlay.classList.add("hidden");
-
-  renderLogs();
-  updateUi();
-
-  addLog("log_cleared");
-});
-
-confirmIdentityBtn.addEventListener("click", async () => {
-  identityOverlay.classList.add("hidden");
-
-  addLog("identity_check_confirmed");
+  addLog("identity_check_passed", {
+    identityPassedCount
+  });
 
   try {
-    await video.play();
+    await els.video.play();
   } catch (error) {
     addLog("resume_after_identity_failed", {
-      message: error.message,
+      message: error.message
     });
   }
+});
+
+els.nextChapterBtn.addEventListener("click", () => {
+  const hasNext = currentChapterIndex < course.chapters.length - 1;
+  els.completionOverlay.classList.add("hidden");
+
+  if (hasNext) {
+    loadChapter(currentChapterIndex + 1);
+  } else {
+    updateCourseProgress();
+  }
+});
+
+els.userForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  user = {
+    id: createId("usr"),
+    name: els.userNameInput.value.trim(),
+    email: els.userEmailInput.value.trim(),
+    department: els.userDeptInput.value.trim(),
+    employeeNo: els.userNoInput.value.trim(),
+    createdAt: new Date().toISOString()
+  };
+
+  saveUser(user);
+  hideUserModal();
+
+  loadProgress();
+  loadLogs();
+  renderLogs();
+  addLog("user_registered", user);
+});
+
+els.resetUserBtn.addEventListener("click", () => {
+  localStorage.removeItem(userStorageKey());
+  user = null;
+  showUserModal();
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden && !video.paused) {
-    video.pause();
-
-    addLog("tab_hidden_pause", {
-      reason: "탭 이탈로 일시정지",
-    });
+  if (document.hidden && currentPolicy?.pauseWhenHidden !== false && !els.video.paused) {
+    els.video.pause();
+    addLog("tab_hidden_pause");
   }
 });
 
 window.addEventListener("beforeunload", () => {
-  addLog("page_unload");
+  updateChapterState();
 });
 
 init();
