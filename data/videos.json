@@ -3,7 +3,7 @@
     "id": "legal-001",
     "title": "법정의무교육 테스트 영상",
     "provider": "url",
-    "src": "https://pub-xxxxxxxx.r2.dev/legal-001.mp4",
+    "src": "https://pub-ff42402b937543739f9e467b350704fd.r2.dev/legal-001.mp4",
     "description": "Cloudflare R2 MP4 재생 테스트"
   }
 ]
