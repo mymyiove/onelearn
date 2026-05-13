@@ -1,69 +1,10 @@
 <!doctype html>
 <html lang="ko">
   <head>
-    <meta charset="UTF-8" id="playPauseBtn" class="primary-btn">재생</button>    <meta charset="UTF-8" />
-            <button id="backBtn" class="secondary-btn">-10초</button>
-
-            <label class="speed-control">
-              배속
-              <select id="speedSelect">
-                <option value="0.75">0.75x</option>
-                <option value="1" selected>1.0x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="1.75">1.75x</option>
-                <option value="2">2.0x</option>
-              </select>
-            </label>
-
-            <button id="fullscreenBtn" class="secondary-btn">전체화면</button>
-          </div>
-
-          <div class="test-tools">
-            <button id="simulateSeekBtn" class="danger-btn">
-              테스트: 강제로 60초 앞으로 이동 시도
-            </button>
-            <button id="clearLogBtn" class="secondary-btn">
-              로그 초기화
-            </button>
-          </div>
-        </section>
-
-        <aside class="log-card">
-          <div class="log-header">
-            <div>
-              <p class="label">Local Watch Log</p>
-              <h2>시청 로그</h2>
-            </div>
-          </div>
-
-          <dl class="stats">
-            <div>
-              <dt>실제 재생 시간</dt>
-              <dd id="actualWatchText">0초</dd>
-            </div>
-            <div>
-              <dt>최대 시청 위치</dt>
-              <dd id="maxPositionText">0초</dd>
-            </div>
-            <div>
-              <dt>차단된 seek</dt>
-              <dd id="blockedSeekText">0회</dd>
-            </div>
-          </dl>
-
-          <pre id="logOutput" class="log-output">로그 대기 중...</pre>
-        </aside>
-      </section>
-    </main>
-
-    <script src="./app.js"></script>
-  </body>
-</html>
-``
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>법정의무교육 비디오 플레이어 테스트</title>
-    <link rel="stylesheet" href="./styles.css" />
+    ./styles.css
   </head>
 
   <body>
@@ -72,8 +13,8 @@
         <p class="eyebrow">LMS Video Player MVP</p>
         <h1>법정의무교육 비디오 플레이어 테스트</h1>
         <p class="subtitle">
-          Google Drive 영상을 커스텀 플레이어로 재생하고,
-          빨리감기 차단 / 배속 허용 / 시청 로그를 테스트합니다.
+          Cloudflare R2 영상을 커스텀 플레이어로 재생하고, 빨리감기 차단 /
+          배속 허용 / 시청 로그를 테스트합니다.
         </p>
       </section>
 
@@ -117,3 +58,60 @@
           </div>
 
           <div class="controls">
+            <button id="playPauseBtn" class="primary-btn">재생</button>
+            <button id="backBtn" class="secondary-btn">-10초</button>
+
+            <label class="speed-control">
+              배속
+              <select id="speedSelect">
+                <option value="0.75">0.75x</option>
+                <option value="1" selected>1.0x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="1.75">1.75x</option>
+                <option value="2">2.0x</option>
+              </select>
+            </label>
+
+            <button id="fullscreenBtn" class="secondary-btn">전체화면</button>
+          </div>
+
+          <div class="test-tools">
+            <button id="simulateSeekBtn" class="danger-btn">
+              테스트: 강제로 60초 앞으로 이동 시도
+            </button>
+            <button id="clearLogBtn" class="secondary-btn">로그 초기화</button>
+          </div>
+        </section>
+
+        <aside class="log-card">
+          <div class="log-header">
+            <div>
+              <p class="label">Local Watch Log</p>
+              <h2>시청 로그</h2>
+            </div>
+          </div>
+
+          <dl class="stats">
+            <div>
+              <dt>실제 재생 시간</dt>
+              <dd id="actualWatchText">0초</dd>
+            </div>
+            <div>
+              <dt>최대 시청 위치</dt>
+              <dd id="maxPositionText">0초</dd>
+            </div>
+            <div>
+              <dt>차단된 seek</dt>
+              <dd id="blockedSeekText">0회</dd>
+            </div>
+          </dl>
+
+          <pre id="logOutput" class="log-output">로그 대기 중...</pre>
+        </aside>
+      </section>
+    </main>
+
+    ./app.jsscript>
+  </body>
+</html>
