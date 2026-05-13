@@ -1,30 +1,48 @@
 :root {
   --bg: #0f172a;
-  --card: #111827;
+  --bg-soft: #111827;
+  --card: rgba(17, 24, 39, 0.9);
+  --card-solid: #111827;
   --card2: #1f2937;
   --text: #e5e7eb;
+  --text-strong: #f9fafb;
   --muted: #9ca3af;
+  --muted2: #6b7280;
   --primary: #60a5fa;
   --primary-dark: #2563eb;
+  --primary-soft: rgba(96, 165, 250, 0.14);
   --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.18);
+  --success: #22c55e;
   --border: rgba(255, 255, 255, 0.12);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
 body {
+  min-height: 100vh;
   margin: 0;
   font-family:
     Pretendard,
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
+    Roboto,
+    "Noto Sans KR",
+    "Apple SD Gothic Neo",
+    "Malgun Gothic",
     sans-serif;
   background:
     radial-gradient(circle at top left, rgba(96, 165, 250, 0.22), transparent 32rem),
+    radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.1), transparent 30rem),
     var(--bg);
   color: var(--text);
 }
@@ -34,12 +52,37 @@ select {
   font: inherit;
 }
 
+button {
+  transition:
+    transform 0.12s ease,
+    opacity 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.94;
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(96, 165, 250, 0.42);
+  outline-offset: 2px;
+}
+
+/* 전체 페이지 */
 .page {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 48px 0;
 }
 
+/* 상단 타이틀 영역 */
 .hero {
   margin-bottom: 28px;
 }
@@ -48,7 +91,7 @@ select {
 .label {
   margin: 0 0 8px;
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -63,36 +106,49 @@ p {
 
 h1 {
   margin-bottom: 12px;
+  color: var(--text-strong);
   font-size: clamp(30px, 5vw, 52px);
   line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
 h2 {
   margin-bottom: 0;
+  color: var(--text-strong);
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  margin-bottom: 8px;
+  color: var(--text-strong);
   font-size: 22px;
 }
 
 .subtitle {
-  max-width: 760px;
+  max-width: 780px;
+  margin-bottom: 0;
   color: var(--muted);
   font-size: 17px;
   line-height: 1.7;
 }
 
+/* 플레이어 + 로그 2단 레이아웃 */
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 20px;
+  align-items: start;
 }
 
 .player-card,
 .log-card {
   border: 1px solid var(--border);
-  background: rgba(17, 24, 39, 0.82);
+  background: var(--card);
   backdrop-filter: blur(16px);
   border-radius: 24px;
   padding: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+  box-shadow: var(--shadow);
 }
 
 .video-header,
@@ -107,21 +163,26 @@ h2 {
 .badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 72px;
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 7px 12px;
   color: #bfdbfe;
-  background: rgba(96, 165, 250, 0.12);
+  background: var(--primary-soft);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
+/* 비디오 영역 */
 .video-wrap {
   position: relative;
   overflow: hidden;
   border-radius: 20px;
   background: #000;
   aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 video {
@@ -129,15 +190,18 @@ video {
   height: 100%;
   display: block;
   background: #000;
+  object-fit: contain;
 }
 
+/* 본인 확인 오버레이 */
 .identity-overlay {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(15, 23, 42, 0.78);
+  background: rgba(15, 23, 42, 0.82);
   z-index: 5;
+  padding: 20px;
 }
 
 .identity-overlay.hidden {
@@ -145,14 +209,22 @@ video {
 }
 
 .identity-box {
-  width: min(360px, calc(100% - 32px));
+  width: min(360px, 100%);
   padding: 24px;
   border-radius: 20px;
-  background: var(--card);
+  background: var(--card-solid);
   border: 1px solid var(--border);
   text-align: center;
+  box-shadow: var(--shadow);
 }
 
+.identity-box p {
+  margin-bottom: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* 진도 영역 */
 .progress-area {
   margin-top: 16px;
 }
@@ -160,6 +232,7 @@ video {
 .progress-meta {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   color: var(--muted);
   font-size: 14px;
   margin-bottom: 8px;
@@ -176,16 +249,20 @@ video {
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #60a5fa, #22c55e);
+  background: linear-gradient(90deg, var(--primary), var(--success));
   border-radius: inherit;
+  transition: width 0.18s linear;
 }
 
 .hint {
   margin-top: 8px;
-  color: var(--muted);
+  margin-bottom: 0;
+  color: var(--muted2);
   font-size: 13px;
+  line-height: 1.5;
 }
 
+/* 컨트롤 버튼 */
 .controls,
 .test-tools {
   display: flex;
@@ -197,15 +274,16 @@ video {
 .primary-btn,
 .secondary-btn,
 .danger-btn {
-  border: 0;
   border-radius: 14px;
   padding: 11px 16px;
   cursor: pointer;
   color: white;
-  font-weight: 700;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .primary-btn {
+  border: 1px solid rgba(96, 165, 250, 0.32);
   background: var(--primary-dark);
 }
 
@@ -215,11 +293,12 @@ video {
 }
 
 .danger-btn {
-  background: rgba(239, 68, 68, 0.18);
+  background: var(--danger-soft);
   border: 1px solid rgba(239, 68, 68, 0.5);
   color: #fecaca;
 }
 
+/* 배속 셀렉트 */
 .speed-control {
   display: inline-flex;
   align-items: center;
@@ -229,6 +308,7 @@ video {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 8px 12px;
+  font-weight: 700;
 }
 
 .speed-control select {
@@ -237,6 +317,13 @@ video {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 6px 8px;
+  cursor: pointer;
+}
+
+/* 로그 카드 */
+.log-card {
+  position: sticky;
+  top: 20px;
 }
 
 .stats {
@@ -249,6 +336,7 @@ video {
   padding: 14px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .stats dt {
@@ -258,8 +346,9 @@ video {
 
 .stats dd {
   margin: 6px 0 0;
+  color: var(--text-strong);
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .log-output {
@@ -277,12 +366,88 @@ video {
   line-height: 1.5;
 }
 
+/* 스크롤바 살짝 정리 */
+.log-output::-webkit-scrollbar {
+  width: 10px;
+}
+
+.log-output::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+.log-output::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.45);
+  border-radius: 999px;
+}
+
+/* 태블릿/모바일 대응 */
 @media (max-width: 920px) {
+  .page {
+    width: min(100% - 24px, 760px);
+    padding: 32px 0;
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }
 
   .log-card {
+    position: static;
     order: 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    width: min(100% - 20px, 520px);
+    padding: 24px 0;
+  }
+
+  h1 {
+    font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .player-card,
+  .log-card {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .video-header,
+  .log-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .badge {
+    min-width: auto;
+  }
+
+  .progress-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .controls,
+  .test-tools {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .danger-btn,
+  .speed-control {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .speed-control {
+    justify-content: space-between;
   }
 }
