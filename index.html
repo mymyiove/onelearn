@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>법정의무교육 비디오 플레이어 테스트</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">LMS Video Player MVP</p>
+        <h1>법정의무교육 비디오 플레이어 테스트</h1>
+        <p class="subtitle">
+          Google Drive 영상을 HTML5 커스텀 플레이어로 재생하고,
+          빨리감기 차단 / 배속 허용 / 시청 로그를 테스트합니다.
+        </p>
+      </section>
+
+      <section class="layout">
+        <section class="player-card">
+          <div class="video-header">
+            <div>
+              <p class="label">현재 강의</p>
+              <h2 id="videoTitle">영상 불러오는 중...</h2>
+            </div>
+            <span id="statusBadge" class="badge">READY</span>
+          </div>
+
+          <div class="video-wrap">
+            <video
+              id="trainingVideo"
+              preload="metadata"
+              playsinline
+              crossorigin="anonymous"
+            >
+              브라우저가 video 태그를 지원하지 않습니다.
+            </video>
+
+            <div id="identityOverlay" class="identity-overlay hidden">
+              <div class="identity-box">
+                <h3>수강 확인</h3>
+                <p>계속 수강 중이면 아래 버튼을 눌러주세요.</p>
+                <button id="confirmIdentityBtn" class="primary-btn">
+                  계속 수강하기
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-area">
+            <div class="progress-meta">
+              <span id="timeText">00:00 / 00:00</span>
+              <span id="progressText">진도율 0%</span>
+            </div>
+            <div class="progress-track">
+              <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <p class="hint">
+              재생바는 표시 전용입니다. 앞으로 이동은 차단하고, 뒤로가기는 허용합니다.
+            </p>
+          </div>
+
+          <div class="controls">
+            <button id="playPauseBtn" class="primary-btn">재생</button>
+            <button id="backBtn" class="secondary-btn">-10초</button>
+
+            <label class="speed-control">
+              배속
+              <select id="speedSelect">
+                <option value="0.75">0.75x</option>
+                <option value="1" selected>1.0x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="1.75">1.75x</option>
+                <option value="2">2.0x</option>
+              </select>
+            </label>
+
+            <button id="fullscreenBtn" class="secondary-btn">전체화면</button>
+          </div>
+
+          <div class="test-tools">
+            <button id="simulateSeekBtn" class="danger-btn">
+              테스트: 강제로 60초 앞으로 이동 시도
+            </button>
+            <button id="clearLogBtn" class="secondary-btn">
+              로그 초기화
+            </button>
+          </div>
+        </section>
+
+        <aside class="log-card">
+          <div class="log-header">
+            <div>
+              <p class="label">Local Watch Log</p>
+              <h2>시청 로그</h2>
+            </div>
+          </div>
+
+          <dl class="stats">
+            <div>
+              <dt>실제 재생 시간</dt>
+              <dd id="actualWatchText">0초</dd>
+            </div>
+            <div>
+              <dt>최대 시청 위치</dt>
+              <dd id="maxPositionText">0초</dd>
+            </div>
+            <div>
+              <dt>차단된 seek</dt>
+              <dd id="blockedSeekText">0회</dd>
+            </div>
+          </dl>
+
+          <pre id="logOutput" class="log-output">로그 대기 중...</pre>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
