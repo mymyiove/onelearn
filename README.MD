@@ -1,3 +1,3 @@
-# OneLearn Frontend Prototype
+# OneLearn v0.2.1 Visual Restore Patch
 
-최신 패키지: v0.2.0_motion_final
+패치 파일만 포함합니다. 기존 v0.2.0 위에 덮어쓰기하세요.

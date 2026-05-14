@@ -28,11 +28,16 @@
   "sections": [
     {
       "sectionId": "sec-001",
-      "title": "스킬 전환 이해",
+      "title": "스킬 전환의 이해",
       "chapterIds": [
         "ch-001",
         "ch-002"
       ]
+    },
+    {
+      "sectionId": "sec-002",
+      "title": "실행 루틴 만들기",
+      "chapterIds": []
     }
   ],
   "chapters": [
