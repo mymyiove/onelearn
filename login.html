@@ -12,25 +12,26 @@
 <body>
   <div class="auth-bg" aria-hidden="true"><span>🎓</span><span>🚀</span><span>✅</span></div>
   <main class="auth-shell">
-    <section class="auth-brand-panel">
+    <section class="auth-brand-panel learner-copy-panel">
       <a class="brand-text" href="./index.html?tenant=woongjin"><span>OneLearn</span><span class="brand-dot"></span></a>
-      <h1 id="tenantHeadline">학습을 시작해볼까요?</h1>
-      <p id="tenantSubtitle">테넌트 정보를 불러오는 중입니다.</p>
+      <p class="login-kicker" id="tenantKicker">웅진 OneLearn</p>
+      <h1 id="tenantHeadline">웅진 OneLearn에<br />오신 것을<br />환영합니다</h1>
+      <p id="tenantSubtitle">오늘도 한 걸음 성장해볼까요? 추천 과정과 학습 현황을 한 곳에서 확인할 수 있습니다.</p>
       <ul class="auth-points">
-        <li>✅ 테넌트별 학습자 계정 분리</li>
-        <li>🔐 이메일 인증 및 최초 비밀번호 변경</li>
-        <li>📄 약관 및 개인정보 안내 확인 후 이용</li>
+        <li>✅ 나에게 필요한 추천 과정을 바로 확인</li>
+        <li>🚀 진행 중인 과정은 이어서 학습</li>
+        <li>🏅 수료 조건을 채우면 자동으로 완료 처리</li>
       </ul>
     </section>
 
     <section class="auth-card">
       <p class="eyebrow">학습자 로그인</p>
       <h2 id="stepTitle">이메일과 초기 비밀번호를 입력해주세요</h2>
-      <p id="stepDesc">초기 비밀번호는 관리자에게 안내받은 임시 비밀번호 또는 사번입니다.</p>
+      <p id="stepDesc">초기 비밀번호는 안내받은 임시 비밀번호 또는 사번입니다.</p>
 
       <form id="loginForm" class="stack active-step">
-        <label>이메일<input id="emailInput" type="email" placeholder="name@company.com" required /></label>
-        <label>비밀번호<input id="passwordInput" type="password" placeholder="초기 비밀번호 또는 변경한 비밀번호" required /></label>
+        <label>이메일<input id="emailInput" type="email" placeholder="name@company.com" autocomplete="email" required /></label>
+        <label>비밀번호<input id="passwordInput" type="password" placeholder="초기 비밀번호 또는 변경한 비밀번호" autocomplete="current-password" required /></label>
         <button class="primary-button" type="submit">로그인</button>
       </form>
 
@@ -41,8 +42,8 @@
       </form>
 
       <form id="passwordForm" class="stack hidden">
-        <label>새 비밀번호<input id="newPasswordInput" type="password" placeholder="8자 이상 권장" required /></label>
-        <label>새 비밀번호 확인<input id="newPasswordConfirmInput" type="password" placeholder="한 번 더 입력" required /></label>
+        <label>새 비밀번호<input id="newPasswordInput" type="password" placeholder="8자 이상 권장" autocomplete="new-password" required /></label>
+        <label>새 비밀번호 확인<input id="newPasswordConfirmInput" type="password" placeholder="한 번 더 입력" autocomplete="new-password" required /></label>
         <button class="primary-button" type="submit">비밀번호 변경</button>
       </form>
 
