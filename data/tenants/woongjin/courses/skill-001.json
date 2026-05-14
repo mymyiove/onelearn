@@ -8,6 +8,10 @@
   "required": true,
   "dueDate": "2026-07-15",
   "estimatedMinutes": 60,
+  "instructor": {
+    "name": "OneLearn 전문 강사",
+    "title": "기업교육 콘텐츠 전문가"
+  },
   "completionPolicy": {
     "requiredCourseProgressPercent": 90,
     "requiredActualWatchPercent": 40,
@@ -16,7 +20,6 @@
     "minPlaybackRate": 0.75,
     "maxPlaybackRate": 1.5,
     "preventForwardSeeking": false,
-    "allowSeekingAfterCompletion": true,
     "identityCheckCount": 0,
     "pauseWhenHidden": true
   },
