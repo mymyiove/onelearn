@@ -1,0 +1,25 @@
+{
+  "tenantId": "woongjin",
+  "courses": [
+    {
+      "courseId": "legal-001",
+      "title": "법정의무교육 테스트 과정",
+      "category": "법정의무교육",
+      "required": true,
+      "dueDate": "2026-06-30",
+      "estimatedMinutes": 45,
+      "courseFile": "./data/tenants/woongjin/courses/legal-001.json",
+      "status": "published"
+    },
+    {
+      "courseId": "skill-001",
+      "title": "AI 시대 스킬 트랜스포메이션",
+      "category": "스킬교육",
+      "required": true,
+      "dueDate": "2026-07-15",
+      "estimatedMinutes": 60,
+      "courseFile": "./data/tenants/woongjin/courses/skill-001.json",
+      "status": "published"
+    }
+  ]
+}
