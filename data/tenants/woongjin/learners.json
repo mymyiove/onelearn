@@ -1,0 +1,14 @@
+{
+  "tenantId": "woongjin",
+  "learners": [
+    {
+      "userId": "u-001",
+      "name": "정호준",
+      "email": "test@woongjin.com",
+      "department": "HRD",
+      "employeeNo": "10018177",
+      "assignedCourses": ["legal-001", "skill-001"],
+      "role": "learner"
+    }
+  ]
+}
