@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="./src/img/Favicon.png" />
   <script>
     const params = new URLSearchParams(window.location.search);
-    const tenant = params.get('tenant') || 'woongjin';
+    const tenant = params.get("tenant") || "woongjin";
     location.replace(`./dashboard.html?tenant=${encodeURIComponent(tenant)}`);
   </script>
 </head>

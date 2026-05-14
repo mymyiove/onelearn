@@ -14,7 +14,8 @@
       "mustChangePassword": true,
       "emailVerified": false,
       "termsAccepted": false,
-      "privacyAccepted": false
+      "privacyAccepted": false,
+      "learningLogAccepted": false
     },
     {
       "userId": "usr-002",
@@ -29,7 +30,8 @@
       "mustChangePassword": true,
       "emailVerified": false,
       "termsAccepted": false,
-      "privacyAccepted": false
+      "privacyAccepted": false,
+      "learningLogAccepted": false
     }
   ]
 }
