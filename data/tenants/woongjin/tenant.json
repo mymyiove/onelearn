@@ -1,13 +1,13 @@
 {
   "tenantId": "woongjin",
   "tenantName": "웅진씽크빅",
-  "displayName": "웅진 OneLearn",
+  "displayName": "웅진 원런",
   "brand": {
-    "logoText": "OneLearn",
+    "logoText": "원런",
     "primaryColor": "#F47721",
     "accentColor": "#FF9A52",
-    "theme": "dark-premium",
-    "welcomeMessage": "틀어놓는 교육이 아니라, 증명되는 학습으로."
+    "theme": "light",
+    "welcomeMessage": "필수 교육, 진행 중 교육, 수료 완료 교육을 한 곳에서 확인하세요."
   },
   "settings": {
     "allowSelfRegistration": false,
