@@ -1,0 +1,48 @@
+{
+  "tenantId": "woongjin",
+  "courseId": "skill-001",
+  "title": "AI 시대 스킬 트랜스포메이션",
+  "subtitle": "SkillOne과 연결되는 스킬 기반 조직 전환 입문 과정",
+  "description": "AI 시대에 필요한 스킬 전환의 개념과 조직 학습 전략을 이해하는 과정입니다.",
+  "category": "스킬교육",
+  "required": true,
+  "dueDate": "2026-07-15",
+  "estimatedMinutes": 60,
+  "brand": {
+    "name": "OneLearn",
+    "tagline": "SkillOne이 전략이라면, OneLearn은 실행과 증빙의 엔진입니다.",
+    "accentColor": "#F47721"
+  },
+  "completionPolicy": {
+    "requiredCourseProgressPercent": 90,
+    "requiredActualWatchPercent": 40,
+    "requireAllChaptersCompleted": true,
+    "allowPlaybackRate": true,
+    "minPlaybackRate": 0.75,
+    "maxPlaybackRate": 1.5,
+    "preventForwardSeeking": false,
+    "allowSeekingAfterCompletion": true,
+    "identityCheckMode": "chapter",
+    "identityCheckCount": 0,
+    "pauseWhenHidden": true
+  },
+  "chapters": [
+    {
+      "chapterId": "ch-001",
+      "title": "스킬 기반 조직 전환의 시작",
+      "description": "DX, AX를 넘어 SX로 전환하는 이유를 학습합니다.",
+      "order": 1,
+      "type": "video",
+      "src": "https://pub-ff42402b937543739f9e467b350704fd.r2.dev/legal-001.mp4",
+      "poster": "",
+      "completionPolicy": {
+        "requiredProgressPercent": 90,
+        "requiredActualWatchPercent": 40,
+        "preventForwardSeeking": false,
+        "allowPlaybackRate": true,
+        "maxPlaybackRate": 1.5,
+        "identityCheckCount": 0
+      }
+    }
+  ]
+}
