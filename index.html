@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OneLearn Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" href="./dashboard.css" />
+    <script src="./dashboard.js" defer></script>
+  </head>
+
+  <body>
+    <div class="dash-noise"></div>
+    <div class="dash-orb dash-orb-a"></div>
+    <div class="dash-orb dash-orb-b"></div>
+
+    <main class="dash-shell">
+      <header class="dash-topbar">
+        <div class="dash-brand">
+          <div class="dash-logo">1</div>
+          <div>
+            <p class="dash-kicker">OneLearn</p>
+            <h1 id="tenantName">교육 대시보드</h1>
+          </div>
+        </div>
+
+        <div class="dash-user">
+          <div>
+            <p class="dash-user-label">Learner</p>
+            <strong id="userNameText">사용자</strong>
+          </div>
+          <button id="changeUserBtn" class="dash-ghost-btn" type="button">
+            사용자 변경
+          </button>
+        </div>
+      </header>
+
+      <section class="dash-hero">
+        <div>
+          <p class="dash-eyebrow">Assigned Learning</p>
+          <h2 id="heroTitle">나에게 배정된 교육</h2>
+          <p id="heroSubtitle" class="dash-subtitle">
+            필수 교육, 진행 중 교육, 수료 완료 교육을 한 곳에서 확인하세요.
+          </p>
+        </div>
+
+        <div class="dash-summary-grid">
+          <article class="dash-summary-card">
+            <span>전체</span>
+            <strong id="totalCount">0</strong>
+          </article>
+          <article class="dash-summary-card">
+            <span>진행 중</span>
+            <strong id="inProgressCount">0</strong>
+          </article>
+          <article class="dash-summary-card">
+            <span>수료 완료</span>
+            <strong id="completedCount">0</strong>
+          </article>
+          <article class="dash-summary-card danger">
+            <span>마감 임박</span>
+            <strong id="urgentCount">0</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="dash-toolbar">
+        <div class="dash-tabs" id="filterTabs">
+          <button class="active" type="button" data-filter="all">전체</button>
+          <button type="button" data-filter="required">필수</button>
+          <button type="button" data-filter="progress">진행 중</button>
+          <button type="button" data-filter="incomplete">미수료</button>
+          <button type="button" data-filter="completed">수료 완료</button>
+          <button type="button" data-filter="urgent">마감 임박</button>
+        </div>
+
+        <div class="dash-search">
+          <input id="searchInput" type="search" placeholder="강의명, 카테고리 검색" />
+        </div>
+      </section>
+
+      <section id="courseGrid" class="course-grid"></section>
+
+      <section id="emptyState" class="empty-state hidden">
+        <p class="dash-eyebrow">No Courses</p>
+        <h3>표시할 교육이 없습니다.</h3>
+        <p>검색어 또는 필터를 변경해보세요.</p>
+      </section>
+    </main>
+
+    <div id="userModal" class="user-modal">
+      <div class="user-box">
+        <p class="dash-eyebrow">Welcome to OneLearn</p>
+        <h2>수강자 정보를 입력해주세요</h2>
+        <p>
+          현재 MVP에서는 로그인 대신 수강자 정보를 브라우저에 저장합니다.
+          이후 이메일 OTP, Microsoft SSO, Odoo 연동으로 확장할 수 있습니다.
+        </p>
+
+        <form id="userForm" class="user-form">
+          <label>
+            이름
+            <input id="userNameInput" type="text" placeholder="예: 정호준" required />
+          </label>
+
+          <label>
+            이메일
+            <input id="userEmailInput" type="email" placeholder="name@company.com" required />
+          </label>
+
+          <label>
+            부서
+            <input id="userDeptInput" type="text" placeholder="예: HRD팀" />
+          </label>
+
+          <label>
+            사번
+            <input id="userNoInput" type="text" placeholder="선택 입력" />
+          </label>
+
+          <button class="dash-primary-btn" type="submit">
+            교육 목록 보기
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
