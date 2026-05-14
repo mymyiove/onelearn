@@ -10,6 +10,10 @@
   "instructor": {
     "name": "OneLearn 전문 강사"
   },
+  "thumbnail": "",
+  "playbackPolicy": {
+    "autoAdvanceNext": false
+  },
   "completionPolicy": {
     "requiredCourseProgressPercent": 90,
     "requiredActualWatchPercent": 40,
@@ -21,6 +25,16 @@
     "identityCheckCount": 0,
     "pauseWhenHidden": true
   },
+  "sections": [
+    {
+      "sectionId": "sec-001",
+      "title": "스킬 전환 이해",
+      "chapterIds": [
+        "ch-001",
+        "ch-002"
+      ]
+    }
+  ],
   "chapters": [
     {
       "chapterId": "ch-001",
