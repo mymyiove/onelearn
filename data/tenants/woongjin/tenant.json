@@ -1,0 +1,24 @@
+{
+  "tenantId": "woongjin",
+  "tenantName": "웅진씽크빅",
+  "displayName": "웅진 OneLearn",
+  "brand": {
+    "logoText": "OneLearn",
+    "primaryColor": "#F47721",
+    "accentColor": "#FF9A52",
+    "theme": "dark-premium",
+    "welcomeMessage": "틀어놓는 교육이 아니라, 증명되는 학습으로."
+  },
+  "settings": {
+    "allowSelfRegistration": false,
+    "defaultLanguage": "ko",
+    "timezone": "Asia/Seoul",
+    "requireEmployeeNo": true
+  },
+  "features": {
+    "certificates": true,
+    "emailOtp": false,
+    "adminDashboard": true,
+    "odooEmbed": true
+  }
+}
