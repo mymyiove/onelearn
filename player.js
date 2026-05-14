@@ -1,4 +1,7 @@
-const COURSE_URL = "./data/course.json";
+const params = new URLSearchParams(window.location.search);
+const TENANT_ID = params.get("tenant") || "woongjin";
+const COURSE_ID = params.get("course") || "legal-001";
+const COURSE_URL = `./data/tenants/${TENANT_ID}/courses/${COURSE_ID}.json`;
 const STORAGE_PREFIX = "onelearn-mvp-02";
 
 const els = {
