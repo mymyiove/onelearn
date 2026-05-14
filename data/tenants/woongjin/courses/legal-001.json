@@ -1,0 +1,48 @@
+{
+  "tenantId": "woongjin",
+  "courseId": "legal-001",
+  "title": "법정의무교육 테스트 과정",
+  "subtitle": "증빙 가능한 법정의무교육 학습 과정",
+  "description": "영상 시청 기록, 배속 정책, 본인확인, 수료 조건을 모두 추적하는 법정의무교육 테스트 과정입니다.",
+  "category": "법정의무교육",
+  "required": true,
+  "dueDate": "2026-06-30",
+  "estimatedMinutes": 45,
+  "brand": {
+    "name": "원런",
+    "tagline": "틀어놓는 교육이 아니라, 증명되는 학습으로.",
+    "accentColor": "#F47721"
+  },
+  "completionPolicy": {
+    "requiredCourseProgressPercent": 95,
+    "requiredActualWatchPercent": 50,
+    "requireAllChaptersCompleted": true,
+    "allowPlaybackRate": true,
+    "minPlaybackRate": 0.75,
+    "maxPlaybackRate": 2,
+    "preventForwardSeeking": true,
+    "allowSeekingAfterCompletion": true,
+    "identityCheckMode": "chapter",
+    "identityCheckCount": 1,
+    "pauseWhenHidden": true
+  },
+  "chapters": [
+    {
+      "chapterId": "ch-001",
+      "title": "AI 시대를 완성하는 마지막 퍼즐: 스킬 트랜스포메이션",
+      "description": "AI 도입 이후 조직의 진짜 전환을 만드는 스킬 중심 학습입니다.",
+      "order": 1,
+      "type": "video",
+      "src": "https://pub-ff42402b937543739f9e467b350704fd.r2.dev/legal-001.mp4",
+      "poster": "",
+      "completionPolicy": {
+        "requiredProgressPercent": 95,
+        "requiredActualWatchPercent": 50,
+        "preventForwardSeeking": true,
+        "allowPlaybackRate": true,
+        "maxPlaybackRate": 2,
+        "identityCheckCount": 1
+      }
+    }
+  ]
+}
