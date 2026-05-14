@@ -1,24 +1,14 @@
 {
   "tenantId": "woongjin",
   "tenantName": "웅진씽크빅",
-  "displayName": "웅진 원런",
+  "displayName": "웅진 OneLearn",
   "brand": {
-    "logoText": "원런",
     "primaryColor": "#F47721",
     "accentColor": "#FF9A52",
-    "theme": "light",
-    "welcomeMessage": "필수 교육, 진행 중 교육, 수료 완료 교육을 한 곳에서 확인하세요."
+    "welcomeMessage": "추천 과정, 진행 중인 과정, 수료 완료 과정을 한 곳에서 확인하세요."
   },
   "settings": {
-    "allowSelfRegistration": false,
     "defaultLanguage": "ko",
-    "timezone": "Asia/Seoul",
-    "requireEmployeeNo": true
-  },
-  "features": {
-    "certificates": true,
-    "emailOtp": false,
-    "adminDashboard": true,
-    "odooEmbed": true
+    "timezone": "Asia/Seoul"
   }
 }

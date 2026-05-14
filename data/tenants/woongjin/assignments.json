@@ -1,0 +1,32 @@
+{
+  "tenantId": "woongjin",
+  "assignments": [
+    {
+      "assignmentId": "asg-001",
+      "tenantId": "woongjin",
+      "userId": "usr-001",
+      "courseId": "legal-001",
+      "required": true,
+      "dueDate": "2026-06-30",
+      "status": "assigned"
+    },
+    {
+      "assignmentId": "asg-002",
+      "tenantId": "woongjin",
+      "userId": "usr-001",
+      "courseId": "skill-001",
+      "required": true,
+      "dueDate": "2026-07-15",
+      "status": "assigned"
+    },
+    {
+      "assignmentId": "asg-003",
+      "tenantId": "woongjin",
+      "userId": "usr-002",
+      "courseId": "legal-001",
+      "required": true,
+      "dueDate": "2026-06-30",
+      "status": "assigned"
+    }
+  ]
+}

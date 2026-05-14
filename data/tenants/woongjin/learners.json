@@ -2,13 +2,34 @@
   "tenantId": "woongjin",
   "learners": [
     {
-      "userId": "u-001",
+      "userId": "usr-001",
+      "tenantId": "woongjin",
       "name": "정호준",
-      "email": "test@woongjin.com",
-      "department": "HRD",
+      "email": "test@company.com",
+      "department": "교육사업팀",
       "employeeNo": "10018177",
-      "assignedCourses": ["legal-001", "skill-001"],
-      "role": "learner"
+      "tempPassword": "10018177",
+      "role": "learner",
+      "status": "invited",
+      "mustChangePassword": true,
+      "emailVerified": false,
+      "termsAccepted": false,
+      "privacyAccepted": false
+    },
+    {
+      "userId": "usr-002",
+      "tenantId": "woongjin",
+      "name": "홍길동",
+      "email": "hong@example.com",
+      "department": "영업팀",
+      "employeeNo": "20000001",
+      "tempPassword": "20000001",
+      "role": "learner",
+      "status": "invited",
+      "mustChangePassword": true,
+      "emailVerified": false,
+      "termsAccepted": false,
+      "privacyAccepted": false
     }
   ]
 }
