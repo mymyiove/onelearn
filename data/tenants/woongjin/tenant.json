@@ -3,7 +3,6 @@
   "tenantName": "웅진씽크빅",
   "displayName": "웅진 OneLearn",
   "brand": {
-    "primaryColor": "#F47721",
-    "welcomeMessage": "추천 과정, 진행 중인 과정, 수료 완료 과정을 한 곳에서 확인하세요."
+    "primaryColor": "#F47721"
   }
 }
