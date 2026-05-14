@@ -222,6 +222,13 @@ async function init() {
     const response = await fetch(COURSE_URL, { cache: "no-store" });
     course = await response.json();
 
+    
+    const dashboardLink = document.getElementById("dashboardLink");
+    if (dashboardLink) {
+      dashboardLink.href = `./index.html?tenant=${TENANT_ID}`;
+    }
+
+
     if (!course || !Array.isArray(course.chapters) || !course.chapters.length) {
       throw new Error("course.json에 챕터 데이터가 없습니다.");
     }
