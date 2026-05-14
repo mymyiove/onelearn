@@ -3,8 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OneLearn Dashboard</title>
+    <title>원런 학습 대시보드</title>
 
+    <link rel="icon" href="./src/img/Favicon.png" type="image/png" />
     <link
       rel="stylesheet"
       as="style"
@@ -16,63 +17,62 @@
   </head>
 
   <body>
-    <div class="dash-noise"></div>
-    <div class="dash-orb dash-orb-a"></div>
-    <div class="dash-orb dash-orb-b"></div>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand-area" href="./index.html?tenant=woongjin" aria-label="원런 홈">
+          <img src="./src/img/skillone_logo_col_full.png" alt="스킬원 로고" class="brand-logo" />
+          <span class="service-name">원런</span>
+        </a>
 
-    <main class="dash-shell">
-      <header class="dash-topbar">
-        <div class="dash-brand">
-          <div class="dash-logo">1</div>
-          <div>
-            <p class="dash-kicker">OneLearn</p>
-            <h1 id="tenantName">교육 대시보드</h1>
+        <nav class="header-nav" aria-label="상단 메뉴">
+          <a href="./index.html?tenant=woongjin" class="nav-link active">내 교육</a>
+          <a href="#" class="nav-link disabled" aria-disabled="true">수료증</a>
+          <a href="#" class="nav-link disabled" aria-disabled="true">고객지원</a>
+        </nav>
+
+        <div class="header-user">
+          <div class="header-user-text">
+            <span>수강자</span>
+            <strong id="userNameText">정보 입력 필요</strong>
           </div>
+          <button id="changeUserBtn" class="outline-button" type="button">사용자 변경</button>
         </div>
+      </div>
+    </header>
 
-        <div class="dash-user">
-          <div>
-            <p class="dash-user-label">Learner</p>
-            <strong id="userNameText">사용자</strong>
-          </div>
-          <button id="changeUserBtn" class="dash-ghost-btn" type="button">
-            사용자 변경
-          </button>
-        </div>
-      </header>
-
-      <section class="dash-hero">
-        <div>
-          <p class="dash-eyebrow">Assigned Learning</p>
-          <h2 id="heroTitle">나에게 배정된 교육</h2>
-          <p id="heroSubtitle" class="dash-subtitle">
-            필수 교육, 진행 중 교육, 수료 완료 교육을 한 곳에서 확인하세요.
+    <main class="page-shell">
+      <section class="hero-section">
+        <div class="hero-copy">
+          <p class="section-label">나에게 배정된 교육</p>
+          <h1 id="heroTitle">필수 교육을 확인하고 학습을 시작하세요</h1>
+          <p id="heroSubtitle">
+            기업에서 배정한 필수 교육과 진행 중인 강의를 한 곳에서 확인할 수 있습니다.
           </p>
         </div>
 
-        <div class="dash-summary-grid">
-          <article class="dash-summary-card">
-            <span>전체</span>
+        <div class="summary-grid" aria-label="학습 요약">
+          <article class="summary-card">
+            <span>전체 교육</span>
             <strong id="totalCount">0</strong>
           </article>
-          <article class="dash-summary-card">
+          <article class="summary-card">
             <span>진행 중</span>
             <strong id="inProgressCount">0</strong>
           </article>
-          <article class="dash-summary-card">
+          <article class="summary-card">
             <span>수료 완료</span>
             <strong id="completedCount">0</strong>
           </article>
-          <article class="dash-summary-card danger">
+          <article class="summary-card warning">
             <span>마감 임박</span>
             <strong id="urgentCount">0</strong>
           </article>
         </div>
       </section>
 
-      <section class="dash-toolbar">
-        <div class="dash-tabs" id="filterTabs">
-          <button class="active" type="button" data-filter="all">전체</button>
+      <section class="toolbar-section" aria-label="교육 검색 및 필터">
+        <div class="filter-tabs" id="filterTabs">
+          <button type="button" class="active" data-filter="all">전체</button>
           <button type="button" data-filter="required">필수</button>
           <button type="button" data-filter="progress">진행 중</button>
           <button type="button" data-filter="incomplete">미수료</button>
@@ -80,27 +80,44 @@
           <button type="button" data-filter="urgent">마감 임박</button>
         </div>
 
-        <div class="dash-search">
-          <input id="searchInput" type="search" placeholder="강의명, 카테고리 검색" />
+        <div class="search-box">
+          <label for="searchInput">교육 검색</label>
+          <input id="searchInput" type="search" placeholder="강의명 또는 카테고리 검색" />
         </div>
       </section>
 
-      <section id="courseGrid" class="course-grid"></section>
+      <section id="courseGrid" class="course-grid" aria-label="교육 목록"></section>
 
       <section id="emptyState" class="empty-state hidden">
-        <p class="dash-eyebrow">No Courses</p>
-        <h3>표시할 교육이 없습니다.</h3>
-        <p>검색어 또는 필터를 변경해보세요.</p>
+        <h2>표시할 교육이 없습니다</h2>
+        <p>검색어 또는 필터 조건을 변경해보세요.</p>
       </section>
     </main>
 
-    <div id="userModal" class="user-modal">
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          <img src="./src/img/skillone_logo_col_full.png" alt="스킬원 로고" class="footer-logo" />
+          <p>
+            원런은 기업별 필수 교육, 챕터별 학습 이력, 수료 정책, 증빙 리포트를 관리하는
+            학습 운영 서비스입니다.
+          </p>
+        </div>
+
+        <div class="footer-meta">
+          <span>© 2026 SkillOne. All rights reserved.</span>
+          <span>학습 기록은 기업별 정책에 따라 관리됩니다.</span>
+        </div>
+      </div>
+    </footer>
+
+    <div id="userModal" class="user-modal" role="dialog" aria-modal="true" aria-labelledby="userModalTitle">
       <div class="user-box">
-        <p class="dash-eyebrow">Welcome to OneLearn</p>
-        <h2>수강자 정보를 입력해주세요</h2>
+        <p class="section-label">학습 시작 전 확인</p>
+        <h2 id="userModalTitle">수강자 정보를 입력해주세요</h2>
         <p>
-          현재 MVP에서는 로그인 대신 수강자 정보를 브라우저에 저장합니다.
-          이후 이메일 OTP, Microsoft SSO, Odoo 연동으로 확장할 수 있습니다.
+          현재 테스트 단계에서는 로그인 대신 입력한 수강자 정보로 학습 이력을 구분합니다.
+          이후 기업 계정 로그인, 이메일 인증, Odoo 연동으로 확장할 수 있습니다.
         </p>
 
         <form id="userForm" class="user-form">
@@ -116,7 +133,7 @@
 
           <label>
             부서
-            <input id="userDeptInput" type="text" placeholder="예: HRD팀" />
+            <input id="userDeptInput" type="text" placeholder="예: 교육사업팀" />
           </label>
 
           <label>
@@ -124,9 +141,7 @@
             <input id="userNoInput" type="text" placeholder="선택 입력" />
           </label>
 
-          <button class="dash-primary-btn" type="submit">
-            교육 목록 보기
-          </button>
+          <button class="primary-button" type="submit">교육 목록 보기</button>
         </form>
       </div>
     </div>
