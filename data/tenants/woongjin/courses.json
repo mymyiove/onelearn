@@ -8,8 +8,7 @@
       "required": true,
       "dueDate": "2026-06-30",
       "estimatedMinutes": 45,
-      "courseFile": "./data/tenants/woongjin/courses/legal-001.json",
-      "status": "published"
+      "courseFile": "./data/tenants/woongjin/courses/legal-001.json"
     },
     {
       "courseId": "skill-001",
@@ -18,8 +17,7 @@
       "required": true,
       "dueDate": "2026-07-15",
       "estimatedMinutes": 60,
-      "courseFile": "./data/tenants/woongjin/courses/skill-001.json",
-      "status": "published"
+      "courseFile": "./data/tenants/woongjin/courses/skill-001.json"
     }
   ]
 }

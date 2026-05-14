@@ -2,9 +2,7 @@
   "tenants": [
     {
       "tenantId": "woongjin",
-      "tenantName": "웅진씽크빅",
-      "status": "active",
-      "path": "./data/tenants/woongjin/tenant.json"
+      "tenantName": "웅진씽크빅"
     }
   ]
 }

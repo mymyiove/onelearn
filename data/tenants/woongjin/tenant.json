@@ -4,11 +4,6 @@
   "displayName": "웅진 OneLearn",
   "brand": {
     "primaryColor": "#F47721",
-    "accentColor": "#FF9A52",
     "welcomeMessage": "추천 과정, 진행 중인 과정, 수료 완료 과정을 한 곳에서 확인하세요."
-  },
-  "settings": {
-    "defaultLanguage": "ko",
-    "timezone": "Asia/Seoul"
   }
 }

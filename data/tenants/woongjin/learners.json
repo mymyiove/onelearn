@@ -3,19 +3,10 @@
   "learners": [
     {
       "userId": "usr-001",
-      "tenantId": "woongjin",
       "name": "정호준",
       "email": "test@company.com",
-      "department": "교육사업팀",
       "employeeNo": "10018177",
-      "tempPassword": "10018177",
-      "role": "learner",
-      "status": "invited",
-      "mustChangePassword": true,
-      "emailVerified": false,
-      "termsAccepted": false,
-      "privacyAccepted": false,
-      "learningLogAccepted": false
+      "tempPassword": "10018177"
     }
   ]
 }

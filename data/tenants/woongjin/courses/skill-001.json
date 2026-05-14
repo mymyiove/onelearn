@@ -2,15 +2,13 @@
   "tenantId": "woongjin",
   "courseId": "skill-001",
   "title": "AI 시대 스킬 트랜스포메이션",
-  "subtitle": "스킬 기반 조직 전환 입문 과정",
   "description": "AI 시대에 필요한 스킬 전환의 개념과 조직 학습 전략을 이해하는 과정입니다.",
   "category": "스킬과정",
   "required": true,
   "dueDate": "2026-07-15",
   "estimatedMinutes": 60,
   "instructor": {
-    "name": "OneLearn 전문 강사",
-    "title": "기업교육 콘텐츠 전문가"
+    "name": "OneLearn 전문 강사"
   },
   "completionPolicy": {
     "requiredCourseProgressPercent": 90,
