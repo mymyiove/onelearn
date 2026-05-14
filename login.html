@@ -13,47 +13,35 @@
   <div class="auth-bg" aria-hidden="true"><span>🎓</span><span>🚀</span><span>✅</span></div>
   <main class="auth-shell">
     <section class="auth-brand-panel">
-      <a class="brand-text" href="./index.html?tenant=woongjin"><span>OneLearn</span><span class="brand-dot"></span></a>
-      <p class="login-kicker" id="tenantKicker">웅진 OneLearn</p>
       <h1 id="tenantHeadline">웅진 OneLearn에<br />오신 것을<br />환영합니다</h1>
-      <p id="tenantSubtitle">오늘도 한 걸음 성장해볼까요? 추천 과정과 학습 현황을 한 곳에서 확인할 수 있습니다.</p>
-      <ul class="auth-points">
-        <li>✅ 나에게 필요한 추천 과정을 바로 확인</li>
-        <li>🚀 진행 중인 과정은 이어서 학습</li>
-        <li>🏅 수료 조건을 채우면 자동으로 완료 처리</li>
-      </ul>
+      <p id="tenantSubtitle">오늘도 한 걸음 성장해볼까요?<br />추천 과정과 학습 현황을 한 곳에서 확인할 수 있습니다.</p>
+      <div class="rollup-wrap" aria-live="polite">
+        <div id="loginRollup" class="rollup-item">✅ 나에게 필요한 추천 과정을 바로 확인</div>
+      </div>
     </section>
 
     <section class="auth-card">
       <p class="eyebrow">학습자 로그인</p>
       <h2 id="stepTitle">이메일과 초기 비밀번호를 입력해주세요</h2>
       <p id="stepDesc">초기 비밀번호는 안내받은 임시 비밀번호 또는 사번입니다.</p>
-
       <form id="loginForm" class="stack active-step">
         <label>이메일<input id="emailInput" type="email" placeholder="name@company.com" autocomplete="email" required /></label>
         <label>비밀번호<input id="passwordInput" type="password" placeholder="초기 비밀번호 또는 변경한 비밀번호" autocomplete="current-password" required /></label>
         <button class="primary-button" type="submit">로그인</button>
       </form>
-
       <form id="verifyForm" class="stack hidden">
         <label>이메일 인증 코드<input id="codeInput" type="text" inputmode="numeric" placeholder="테스트 코드: 123456" required /></label>
         <button class="primary-button" type="submit">이메일 인증 완료</button>
         <button id="backToLoginBtn" class="ghost-button" type="button">이전으로</button>
       </form>
-
       <form id="passwordForm" class="stack hidden">
         <label>새 비밀번호<input id="newPasswordInput" type="password" placeholder="8자 이상 권장" autocomplete="new-password" required /></label>
         <label>새 비밀번호 확인<input id="newPasswordConfirmInput" type="password" placeholder="한 번 더 입력" autocomplete="new-password" required /></label>
         <button class="primary-button" type="submit">비밀번호 변경</button>
       </form>
-
       <p id="authMessage" class="form-message"></p>
       <div class="auth-help">테스트 계정: <strong>test@company.com</strong> / 초기 비밀번호: <strong>10018177</strong></div>
     </section>
   </main>
-
-  <script src="./src/js/config.js"></script>
-  <script src="./src/js/storage.js"></script>
-  <script src="./src/js/auth.js"></script>
-</body>
-</html>
+  <script src="./src/js/config.js"></script><script src="./src/js/storage.js"></script><script src="./src/js/auth.js"></script>
+</body></html>

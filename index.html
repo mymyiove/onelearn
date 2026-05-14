@@ -1,17 +1,1 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OneLearn</title>
-  <link rel="icon" type="image/png" href="./src/img/Favicon.png" />
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const tenant = params.get("tenant") || "woongjin";
-    location.replace(`./dashboard.html?tenant=${encodeURIComponent(tenant)}`);
-  </script>
-</head>
-<body>
-  <p>OneLearn으로 이동 중입니다.</p>
-</body>
-</html>
+<!doctype html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>OneLearn</title><link rel="icon" type="image/png" href="./src/img/Favicon.png"/><script>const t=new URLSearchParams(location.search).get('tenant')||'woongjin';location.replace(`./dashboard.html?tenant=${encodeURIComponent(t)}`);</script></head><body><p>OneLearn으로 이동 중입니다.</p></body></html>
