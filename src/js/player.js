@@ -27,13 +27,10 @@ const els = {
   due: $('dueDateText'),
   cat: $('categoryText'),
   detailCompletion: $('detailCompletionText'),
-
   policyChips: $('coursePolicyChips'),
-  detailChips: $('courseDetailChips'),
 
   chCount: $('chapterCountBadge'),
   outline: $('courseOutline'),
-
   cPct: $('courseProgressText'),
   cFill: $('courseTrackFill'),
   chProg: $('chapterProgressText'),
@@ -69,7 +66,6 @@ const els = {
   chapterTitle: $('chapterTitle'),
   chapterDesc: $('chapterDesc'),
   chapterIndex: $('chapterIndexText'),
-
   prev: $('prevChapterControl'),
   next: $('nextChapterControl'),
 
@@ -108,6 +104,7 @@ function fmt(s) {
 
 function fmtDate(d) {
   if (!d) return '마감 없음';
+
   const x = new Date(d + 'T00:00:00');
   return `${String(x.getFullYear()).slice(2)}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')}`;
 }
@@ -175,13 +172,9 @@ async function init() {
 
   try {
     const ld = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/learners.json`);
-    learner = (ld.learners || []).find(x => x.userId === session.userId) || {
-      name: session.name || '학습자'
-    };
+    learner = (ld.learners || []).find(x => x.userId === session.userId) || { name: session.name || '학습자' };
   } catch {
-    learner = {
-      name: session.name || '학습자'
-    };
+    learner = { name: session.name || '학습자' };
   }
 
   els.welcome.textContent = `${tenant.tenantName || tenant.displayName || 'OneLearn'} · ${learner.name} 님`;
@@ -243,55 +236,30 @@ function renderBase() {
   renderCourse();
 }
 
-function chipHtml(label, cls = '') {
-  return `<span class="course-policy-chip ${cls}">${label}</span>`;
-}
-
 function buildChips() {
   const p = course.completionPolicy || {};
-  const arr = [];
+  const chips = [];
 
-  arr.push({
+  chips.push({
     label: `⏰ ${remainText(course.dueDate)} · ${fmtDate(course.dueDate)}`,
     cls: 'deadline'
   });
 
-  if (p.preventForwardSeeking) {
-    arr.push({ label: '🔒 앞으로 이동 제한' });
-  }
+  if (p.preventForwardSeeking) chips.push({ label: '🔒 앞으로 이동 제한' });
+  if (p.identityCheckCount) chips.push({ label: `🧑‍💻 본인확인 ${p.identityCheckCount}회` });
+  if (p.requiredActualWatchPercent) chips.push({ label: `⏱ 실제 시청 ${p.requiredActualWatchPercent}%` });
+  if (p.requiredCourseProgressPercent) chips.push({ label: `✅ 완료 ${p.requiredCourseProgressPercent}%` });
+  if (p.maxPlaybackRate) chips.push({ label: `⚡ 최대 ${p.maxPlaybackRate}x` });
+  if (p.pauseWhenHidden) chips.push({ label: '👁 화면 이탈 감지' });
 
-  if (p.identityCheckCount) {
-    arr.push({ label: `🧑‍💻 본인확인 ${p.identityCheckCount}회` });
-  }
-
-  if (p.requiredActualWatchPercent) {
-    arr.push({ label: `⏱ 실제 시청 ${p.requiredActualWatchPercent}%` });
-  }
-
-  if (p.requiredCourseProgressPercent) {
-    arr.push({ label: `✅ 완료 ${p.requiredCourseProgressPercent}%` });
-  }
-
-  if (p.maxPlaybackRate) {
-    arr.push({ label: `⚡ 최대 ${p.maxPlaybackRate}x` });
-  }
-
-  if (p.pauseWhenHidden) {
-    arr.push({ label: '👁 화면 이탈 감지' });
-  }
-
-  return arr;
+  return chips;
 }
 
 function renderPolicyChips() {
   const chips = buildChips();
 
   els.policyChips.innerHTML = chips
-    .map(c => chipHtml(c.label, c.cls || ''))
-    .join('');
-
-  els.detailChips.innerHTML = chips
-    .map(c => chipHtml(c.label, c.cls || ''))
+    .map(c => `<span class="course-policy-chip ${c.cls || ''}">${c.label}</span>`)
     .join('');
 }
 
@@ -300,13 +268,11 @@ function renderOutline() {
 
   const sections = course.sections?.length
     ? course.sections
-    : [
-        {
-          sectionId: 'sec-001',
-          title: '기본 섹션',
-          chapterIds: chapters.map(c => c.chapterId)
-        }
-      ];
+    : [{
+        sectionId: 'sec-001',
+        title: '기본 섹션',
+        chapterIds: chapters.map(c => c.chapterId)
+      }];
 
   sections.forEach((sec, si) => {
     const box = document.createElement('section');
@@ -314,8 +280,8 @@ function renderOutline() {
 
     box.innerHTML = `
       <button class="outline-toggle" type="button">
-        섹션${si + 1}. ${sec.title}
-        <span>⌄</span>
+        <span>섹션${si + 1}. ${sec.title}</span>
+        <span class="outline-chevron">▾</span>
       </button>
       <div class="outline-body"></div>
     `;
@@ -412,9 +378,7 @@ function renderCourse() {
 
     total += r;
 
-    if (s.completed) {
-      done++;
-    }
+    if (s.completed) done++;
   });
 
   const r = Math.round(chapters.length ? total / chapters.length : 0);
@@ -428,9 +392,7 @@ function update() {
   const s = state(current);
   const d = els.video.duration || s.duration || 0;
 
-  if (d) {
-    s.duration = d;
-  }
+  if (d) s.duration = d;
 
   const c = els.video.currentTime || 0;
 
@@ -527,7 +489,6 @@ function pulseCenterHint(icon) {
 
 els.video.onloadedmetadata = () => {
   const s = state(current);
-
   s.duration = els.video.duration;
 
   if (s.maxAllowedTime) {
@@ -658,7 +619,6 @@ els.rate.onchange = () => {
 
   els.rate.value = String(safe);
   els.video.playbackRate = safe;
-
   showControls();
 };
 
@@ -684,9 +644,9 @@ els.rotate.onclick = async () => {
       await els.stage.requestFullscreen();
     }
 
-    const t = screen.orientation?.type || '';
+    const type = screen.orientation?.type || '';
 
-    if (t.includes('landscape')) {
+    if (type.includes('landscape')) {
       await screen.orientation.lock('portrait');
     } else {
       await screen.orientation.lock('landscape');
@@ -712,10 +672,7 @@ els.overlayClose.onclick = e => {
 
 els.toggle.onclick = () => {
   const open = els.detail.classList.toggle('hidden') === false;
-
   els.toggle.textContent = open ? '접기 ∧' : '자세히 >';
-
-  renderPolicyChips();
 };
 
 els.submit.onclick = () => {
@@ -790,14 +747,4 @@ document.addEventListener('keydown', e => {
       els.video.pause();
     }
 
-    showControls();
-  }
-
-  if (e.key.toLowerCase() === 'f') {
-    toggleFullscreen();
-  }
-});
-
-addEventListener('resize', renderPolicyChips);
-
-init();
+   
