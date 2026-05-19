@@ -1,3 +1,73 @@
+.player-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(circle at center, #fff, #f3f4f8);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: opacity .4s ease;
+}
+
+.player-loader.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 카드 */
+
+.loader-card {
+  text-align: center;
+}
+
+/* 돌아가는 이모지 */
+
+.loader-icon {
+  font-size: 48px;
+  animation: spin 1.2s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
+/* 텍스트 */
+
+.loader-card h1 {
+  margin-top: 14px;
+  font-size: 20px;
+}
+
+/* ✅ 프로그레스 바 */
+
+.loader-bar {
+  width: 160px;
+  height: 6px;
+  margin-top: 12px;
+  background: #eee;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.loader-bar i {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg,#F47721,#ff9b50);
+  animation: loadBar 1s infinite;
+}
+
+@keyframes loadBar {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+
+
 /* 기본 */
 
 body {
