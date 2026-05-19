@@ -1,1053 +1,405 @@
+/* 기본 */
+
 body {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  background: #f6f7fb;
 }
 
-.glass-card,
-.chapter-panel,
-.video-panel,
-.policy-panel,
-.completion-card {
-  background: var(--glass);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, .72);
-  box-shadow: var(--shadow);
+.glass-card {
+  background: rgba(255,255,255,.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 26px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.05);
 }
 
-.player-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  animation: hide 1.1s ease 1s forwards;
-}
-
-.player-loader.done {
-  display: none;
-}
-
-@keyframes hide {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
+/* 레이아웃 */
 
 .player-shell {
   width: min(1280px, calc(100% - 40px));
   margin: 0 auto;
-  padding: 22px 0 30px;
-  flex: 1;
-}
-
-.course-hero,
-.chapter-panel,
-.video-panel,
-.policy-panel,
-.completion-card {
-  border-radius: 28px;
-}
-
-.course-hero {
-  padding: 24px 28px;
-  margin-bottom: 16px;
-}
-
-.course-hero-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 18px;
-}
-
-.course-hero-copy {
-  min-width: 0;
-}
-
-.course-hero h1 {
-  margin: 0;
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.05;
-  letter-spacing: -.035em;
-}
-
-.course-policy-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 12px;
-}
-
-.course-policy-chip {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(244, 119, 33, .2);
-  background: var(--brand-light);
-  color: var(--brand-dark);
-  font-size: 12px;
-  font-weight: 950;
-  white-space: nowrap;
-}
-
-.course-detail-panel {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 18px;
-  align-items: stretch;
-}
-
-.course-thumbnail-box {
-  min-height: 144px;
-  border-radius: 24px;
-  border: 1px solid var(--line);
-  overflow: hidden;
-  background: linear-gradient(135deg, var(--brand-light), #fff);
-  background-size: cover;
-  background-position: center;
-}
-
-.course-thumbnail-box.has-image .course-thumbnail-fallback {
-  display: none;
-}
-
-.course-thumbnail-fallback {
-  width: 100%;
-  height: 100%;
-  min-height: 144px;
-  padding: 18px;
-  display: grid;
-  align-content: end;
-  gap: 4px;
-  background:
-    radial-gradient(circle at 20% 18%, rgba(244,119,33,.18), transparent 8rem),
-    linear-gradient(135deg, #fff8f2, #fff);
-}
-
-.course-thumbnail-fallback span {
-  color: var(--brand-dark);
-  font-size: 13px;
-  font-weight: 950;
-}
-
-.course-thumbnail-fallback strong {
-  color: #151515;
-  font-size: 22px;
-  line-height: 1.1;
-  letter-spacing: -.02em;
-}
-
-.course-detail-content {
-  min-width: 0;
-  display: grid;
-  gap: 14px;
-  align-content: start;
-}
-
-.course-detail-content > p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.55;
-  font-weight: 750;
-}
-
-.course-extra-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-}
-
-.course-extra-grid div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .72);
-}
-
-.course-extra-grid span {
-  color: #9297a5;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.course-extra-grid strong {
-  min-width: 0;
-  text-align: right;
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 20px 0;
 }
 
 .player-main {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr) 260px;
+  grid-template-columns: 260px 1fr;
   gap: 16px;
-  align-items: start;
 }
 
-.chapter-panel,
-.policy-panel,
-.completion-card {
-  padding: 20px;
+/* ✅ 과정 카드 */
+
+.course-hero {
+  padding: 24px;
+  margin-bottom: 16px;
 }
 
-.completion-card h2,
-.policy-panel h2 {
-  margin: 0 0 14px;
-  font-size: 21px;
-  font-weight: 950;
-}
-
-.panel-head {
+.course-hero-main {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
 }
 
-.drawer-close {
-  display: none;
+.course-hero-left h1 {
+  margin: 0;
+  font-size: 32px;
 }
 
-.course-outline {
+.course-policy-chips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.course-policy-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #ffe8db;
+  color: #d55a00;
+}
+
+/* ✅ 헬조 중요: 마감일 강조 */
+
+.course-policy-chip.deadline {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+/* 상세 */
+
+.course-detail-panel {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+
   display: grid;
-  gap: 10px;
-  margin-top: 16px;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
 }
 
-.outline-section {
-  border: 1px solid var(--line);
-  border-radius: 18px;
+.course-thumbnail-box {
+  border-radius: 20px;
   overflow: hidden;
-  background: #fbfbfd;
+  background: #fff3ea;
+  min-height: 120px;
 }
 
-.outline-toggle {
-  width: 100%;
-  border: 0;
-  background: #fff;
-  padding: 13px 14px;
-  text-align: left;
-  font-weight: 950;
+.course-thumbnail-fallback {
+  padding: 14px;
+  display: grid;
+  justify-content: end;
+}
+
+.course-extra-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+}
+
+.course-extra-grid div {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fafafa;
   display: flex;
   justify-content: space-between;
 }
 
-.outline-section.collapsed .outline-body {
-  display: none;
+/* ✅ 좌측 드로어 */
+
+.chapter-panel {
+  padding: 16px;
 }
 
-.outline-body {
-  display: grid;
-  gap: 9px;
-  padding: 11px;
+.drawer-progress {
+  margin: 14px 0 16px;
 }
 
-.chapter-button {
-  width: 100%;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  padding: 12px;
-  font-weight: 700;
-  font-size: 13px;
-  transition: .18s ease;
+.drawer-progress strong {
+  font-size: 28px;
 }
 
-.chapter-button.active {
-  background: var(--brand-light);
-  border-color: rgba(244, 119, 33, .45);
-  box-shadow: 0 10px 24px rgba(244, 119, 33, .1);
-}
-
-.chapter-button strong {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-weight: 850;
-  line-height: 1.35;
-}
-
-.chapter-percent {
-  display: block;
-  margin-top: 7px;
-  color: #79808d;
-  font-size: 11px;
-  text-align: right;
-  font-weight: 900;
-}
-
-.chapter-mini-progress,
 .mini-track {
-  height: 7px;
-  margin-top: 8px;
+  height: 6px;
+  background: #eee;
   border-radius: 999px;
-  background: #ececf3;
-  overflow: hidden;
+  margin-top: 6px;
 }
 
-.chapter-mini-progress i,
 .mini-track i {
   display: block;
   height: 100%;
-  background: var(--brand);
+  background: #F47721;
 }
 
-.right-study-panel {
+/* 챕터 버튼 */
+
+.course-outline {
   display: grid;
-  gap: 14px;
-  align-content: start;
+  gap: 8px;
 }
 
-.completion-card strong {
-  display: block;
-  font-size: 34px;
-  letter-spacing: -.03em;
+.chapter-button {
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #eee;
+  background: #fff;
+  font-size: 13px;
+  text-align: left;
 }
+
+.chapter-button.active {
+  background: #fff3ea;
+  border-color: #f47721;
+}
+
+/* ✅ 영상 영역 */
 
 .video-panel {
-  padding: 20px;
-  position: relative;
-}
-
-.video-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-  margin-bottom: 14px;
+  padding: 18px;
 }
 
 .video-top h2 {
   margin: 0;
   font-size: 22px;
-  line-height: 1.25;
-  letter-spacing: -.02em;
 }
 
 .video-top p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.45;
-  font-weight: 750;
-}
-
-.player-stage {
-  position: relative;
-  display: grid;
-  gap: 10px;
+  margin: 6px 0 12px;
+  color: #666;
 }
 
 .video-wrap {
   position: relative;
+  border-radius: 20px;
   overflow: hidden;
-  border-radius: 22px;
-  background: #050505;
+  background: #000;
   aspect-ratio: 16 / 9;
-  cursor: pointer;
 }
 
 video {
   width: 100%;
   height: 100%;
-  display: block;
-  background: #000;
 }
 
-.video-overlay {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  background: rgba(0, 0, 0, .62);
-  color: #fff;
-  padding: 24px;
-}
-
-.video-overlay.dismissed {
-  display: none !important;
-}
-
-.overlay-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: 0;
-  background: rgba(0, 0, 0, .58);
-  color: #fff;
-  font-size: 22px;
-}
-
-.video-center-hint {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 72px;
-  height: 72px;
-  margin: -36px 0 0 -36px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, .5);
-  color: #fff;
-  font-size: 32px;
-  opacity: 0;
-  transform: scale(.96);
-  transition: .18s;
-}
-
-.video-center-hint.show {
-  opacity: 1;
-  transform: scale(1);
-}
+/* ✅ 컨트롤 */
 
 .player-controls {
+  margin-top: 10px;
   display: grid;
-  gap: 9px;
+  gap: 8px;
 }
+
+/* meta (시간 + 챕터) */
 
 .player-meta-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  min-height: 28px;
-}
-
-.player-meta-row strong {
-  min-width: 0;
-  color: #687083;
-  font-size: 13px;
-  font-weight: 950;
-  white-space: nowrap;
 }
 
 .chapter-inline-nav {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
-  min-height: 30px;
-  padding: 0 6px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .86);
 }
 
 .chapter-inline-nav button {
   width: 28px;
   height: 28px;
-  border: 0;
   border-radius: 999px;
+  border: 1px solid #ddd;
   background: #fff;
-  color: #626a7a;
-  font-size: 17px;
-  font-weight: 950;
-  display: grid;
-  place-items: center;
 }
 
-.chapter-inline-nav button:disabled {
-  opacity: .35;
-  cursor: not-allowed;
-}
-
-.chapter-inline-nav span {
-  min-width: 34px;
-  text-align: center;
-  color: var(--brand-dark);
-  font-size: 12px;
-  font-weight: 950;
-}
+/* 타임라인 */
 
 .timeline {
-  position: relative;
-  height: 10px;
+  height: 8px;
+  background: #eee;
   border-radius: 999px;
-  background: #ececf3;
-  overflow: visible;
   cursor: pointer;
+  position: relative;
 }
 
 .timeline span {
-  position: absolute;
-  left: 0;
-  top: 0;
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--brand), #ff8a3d);
+  background: #F47721;
+  display: block;
   width: 0;
+  border-radius: 999px;
 }
 
-.identity-marker {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
-  border-radius: 999px;
-  background: #111;
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 4px rgba(17, 17, 17, .12);
-}
+/* ✅ 컨트롤바 핵심 */
 
 .control-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
 }
+
+/* 재생 */
 
 .play-control {
-  flex: 0 0 54px;
-  min-width: 54px;
-  min-height: 44px;
-  font-size: 18px;
-  padding: 0;
+  width: 56px;
+  height: 44px;
 }
 
-.rate-select,
-.volume-control {
-  min-height: 44px;
-  border-radius: 999px;
-  border: 1px solid var(--line-2);
-  background: #fff;
-  display: inline-flex;
-  align-items: center;
-  font-weight: 950;
-}
+/* 배속 */
 
 .rate-select {
-  flex: 0 0 84px;
-  padding: 0 12px;
+  width: 80px;
 }
 
-.rate-select select {
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  font-size: 13px;
-  font-weight: 950;
-}
+/* ✅ 볼륨 (제한된 크기!!) */
 
 .volume-control {
   flex: 0 0 150px;
-  padding: 0 12px;
 }
 
 .volume-control input {
   width: 100%;
-  min-width: 0;
-  accent-color: var(--brand);
 }
+
+/* 버튼 */
 
 .icon-control {
-  flex: 0 0 46px;
-  min-width: 46px;
-  min-height: 44px;
-  padding: 0;
-  font-weight: 950;
+  width: 46px;
+  height: 44px;
 }
 
-.player-hint {
-  margin: 11px 0 0;
-  color: #a4a8b3;
-  font-size: 12px;
-  font-weight: 750;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+/* ✅ 회전버튼 */
+
+.rotate-btn {
+  font-size: 14px;
 }
 
-.help-link {
-  border: 0;
-  background: transparent;
-  color: #7b8190;
-  text-decoration: underline;
-  font-weight: 900;
-  padding: 0;
-  white-space: nowrap;
-}
-
-.due-box {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 13px 18px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #fff1e8, #fff);
-  border: 1px solid rgba(244, 119, 33, .2);
-  color: var(--brand-dark);
-  margin-top: 14px;
-}
-
-.due-box span {
-  font-size: 13px;
-  font-weight: 950;
-}
-
-.due-box strong {
-  font-size: 17px;
-  white-space: nowrap;
-}
-
-.policy-panel dl {
-  margin: 10px 0;
-}
-
-.policy-panel div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.policy-panel dt {
-  color: #6f7787;
-}
-
-.policy-panel dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 850;
-}
-
-.identity-box {
-  text-align: center;
-}
-
-.identity-code {
-  display: inline-block;
-  padding: 9px 16px;
-  border-radius: 14px;
-  background: #111;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 950;
-  margin-bottom: 12px;
-}
-
-.identity-box input {
-  width: 100%;
-  height: 46px;
-  margin-bottom: 12px;
-  border: 1px solid var(--line-2);
-  border-radius: 15px;
-  padding: 0 14px;
-}
-
-.help-modal {
-  max-height: 86svh;
-  overflow: auto;
-}
-
-.help-modal li {
-  margin: 8px 0;
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.confirm-box {
-  text-align: center;
-}
-
-.confirm-box div {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
+/* ✅ 전체화면 */
 
 .player-stage:fullscreen {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  display: block;
   background: #000;
-  border-radius: 0;
 }
 
 .player-stage:fullscreen .video-wrap {
   position: absolute;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
   aspect-ratio: auto;
-  border-radius: 0;
 }
 
 .player-stage:fullscreen video {
-  width: 100%;
-  height: 100%;
   object-fit: contain;
 }
 
+/* ✅ 오버레이 컨트롤 */
+
 .player-stage:fullscreen .player-controls {
   position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 20;
-  display: grid;
-  gap: 12px;
-  padding: 72px 28px 28px;
-  background: linear-gradient(to top, rgba(0, 0, 0, .78), rgba(0, 0, 0, .42) 45%, transparent);
-  transition: opacity .22s ease, transform .22s ease;
+
+  padding: 24px;
+  background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
+
+  transition: .2s;
 }
 
-.player-stage:fullscreen:not(.controls-visible) .player-controls {
+/* 컨트롤 숨김 */
+
+.player-stage:not(.controls-visible):fullscreen .player-controls {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(14px);
 }
 
-.player-stage:fullscreen .player-meta-row,
-.player-stage:fullscreen .timeline,
-.player-stage:fullscreen .control-bar {
-  width: min(1080px, calc(100vw - 48px));
-  margin-left: auto;
-  margin-right: auto;
-}
+/* 전체화면 전용 스타일 */
 
 .player-stage:fullscreen .player-meta-row strong {
   color: #fff;
 }
 
-.player-stage:fullscreen .chapter-inline-nav {
-  background: rgba(255, 255, 255, .14);
-  border-color: rgba(255, 255, 255, .22);
-}
-
-.player-stage:fullscreen .chapter-inline-nav span {
-  color: #fff;
-}
-
-.player-stage:fullscreen .chapter-inline-nav button,
+.player-stage:fullscreen .chapter-inline-nav,
+.player-stage:fullscreen .control-bar button,
 .player-stage:fullscreen .rate-select,
-.player-stage:fullscreen .volume-control,
-.player-stage:fullscreen .control-button {
-  background: rgba(255, 255, 255, .96);
+.player-stage:fullscreen .volume-control {
+  background: rgba(255,255,255,.9);
 }
 
-@media(max-width:1120px) {
+/* ✅ 모바일 */
+
+@media (max-width: 760px) {
+
   .player-main {
     grid-template-columns: 1fr;
-  }
-
-  .video-panel {
-    order: 1;
-  }
-
-  .right-study-panel {
-    order: 2;
-  }
-
-  .chapter-panel {
-    order: 3;
-  }
-}
-
-@media(min-width:761px) {
-  .player-header .hamburger {
-    display: none !important;
-  }
-}
-
-@media(max-width:760px) {
-  .player-header-inner {
-    display: flex;
-  }
-
-  .player-header .brand-text {
-    font-size: 21px;
-  }
-
-  .player-user .outline-button {
-    position: absolute;
-    right: 76px;
-    top: 11px;
-  }
-
-  .player-header .hamburger {
-    display: inline-flex;
-    position: absolute;
-    right: 12px;
-    top: 11px;
-    min-height: 36px;
-    font-size: 12px;
-  }
-
-  .player-shell {
-    width: calc(100% - 20px);
-    padding: 10px 0 20px;
-    overflow-x: hidden;
   }
 
   .course-hero {
     padding: 16px;
-    border-radius: 24px;
-    margin-bottom: 10px;
   }
 
-  .course-hero-main {
-    gap: 10px;
+  .course-hero-left h1 {
+    font-size: 22px;
   }
 
-  .course-hero h1 {
-    font-size: 23px;
-    line-height: 1.12;
-  }
+  /* ✅ 모바일: 배지 숨김 (마감일 제외 → JS에서 처리) */
 
   .course-policy-chips {
-    gap: 5px;
-    margin-top: 9px;
-  }
-
-  .course-policy-chip {
-    min-height: 24px;
-    padding: 0 8px;
-    font-size: 10.5px;
-  }
-
-  .course-hero .soft-button {
-    min-height: 34px;
-    padding: 0 12px;
-    font-size: 12px;
+    flex-wrap: nowrap;
+    overflow: hidden;
   }
 
   .course-detail-panel {
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 14px;
-    padding-top: 14px;
-  }
-
-  .course-thumbnail-box,
-  .course-thumbnail-fallback {
-    min-height: 116px;
-  }
-
-  .course-extra-grid {
-    grid-template-columns: 1fr;
-    gap: 7px;
-  }
-
-  .course-extra-grid div {
-    min-height: 40px;
-  }
-
-  .player-main {
-    display: grid;
-    gap: 10px;
   }
 
   .video-panel {
-    padding: 16px;
-    border-radius: 24px;
-    min-width: 0;
+    padding: 14px;
   }
 
-  .video-top {
-    margin-bottom: 11px;
-  }
-
-  .video-top h2 {
-    font-size: 19px;
-  }
-
-  .video-top p {
-    font-size: 13px;
-  }
-
-  .player-stage {
-    gap: 9px;
-  }
-
-  .video-wrap {
-    border-radius: 18px;
-  }
-
-  .player-controls {
-    gap: 8px;
-  }
-
-  .player-meta-row {
-    gap: 8px;
-  }
-
-  .player-meta-row strong {
-    font-size: 12px;
-  }
-
-  .chapter-inline-nav {
-    gap: 4px;
-    min-height: 29px;
-    padding: 0 4px;
-  }
-
-  .chapter-inline-nav button {
-    width: 27px;
-    height: 27px;
-    font-size: 16px;
-  }
-
-  .chapter-inline-nav span {
-    min-width: 30px;
-    font-size: 11px;
-  }
-
-  .timeline {
-    height: 9px;
-  }
-
-  .control-bar {
-    gap: 6px;
-  }
+  /* ✅ 컨트롤 축소 */
 
   .play-control {
-    flex-basis: 48px;
-    min-width: 48px;
-    min-height: 42px;
-    font-size: 17px;
+    width: 48px;
+    height: 42px;
   }
 
   .rate-select {
-    flex-basis: 66px;
-    min-height: 42px;
-    padding: 0 8px;
-  }
-
-  .rate-select select {
-    font-size: 12px;
+    width: 64px;
   }
 
   .volume-control {
-    flex: 1 1 auto;
-    min-width: 86px;
-    max-width: 128px;
-    min-height: 42px;
-    padding: 0 8px;
+    flex: 1;
+    min-width: 80px;
+    max-width: 120px;
   }
 
   .icon-control {
-    flex-basis: 42px;
-    min-width: 42px;
-    min-height: 42px;
-    font-size: 12px;
+    width: 42px;
+    height: 42px;
   }
 
-  .player-hint {
-    font-size: 11px;
-  }
+}
 
-  .right-study-panel {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+/* ✅ 드로어 (모바일) */
 
-  .completion-card,
-  .policy-panel {
-    padding: 14px;
-    border-radius: 21px;
-  }
-
-  .completion-card h2,
-  .policy-panel h2 {
-    font-size: 16px;
-  }
-
-  .completion-card strong {
-    font-size: 28px;
-  }
-
-  .due-box {
-    padding: 10px 13px;
-    border-radius: 18px;
-  }
-
-  .due-box strong {
-    font-size: 14px;
-  }
-
-  .policy-panel div {
-    padding: 8px 0;
-    font-size: 12px;
-  }
+@media (max-width: 760px) {
 
   .chapter-panel {
     position: fixed;
+    left: 0;
     top: 0;
     bottom: 0;
-    left: 0;
-    z-index: 100;
-    width: min(86vw, 340px);
-    max-height: none;
-    transform: translateX(-105%);
-    transition: .28s;
-    border-radius: 0 24px 24px 0;
-    padding: 18px;
-    background: rgba(255, 255, 255, .95);
+    width: 85vw;
+    transform: translateX(-100%);
+    transition: .3s;
+    z-index: 999;
   }
 
   .chapter-panel.open {
     transform: translateX(0);
-    box-shadow: 0 0 0 999px rgba(20, 20, 30, .38), var(--shadow);
+    box-shadow: 0 0 0 999px rgba(0,0,0,.4);
   }
 
-  .drawer-close {
-    display: grid;
-    place-items: center;
-    position: absolute;
-    right: 12px;
-    top: 12px;
-    width: 34px;
-    height: 34px;
-    border: 0;
-    background: #111;
-    color: #fff;
-    border-radius: 999px;
-    font-size: 20px;
-  }
-
-  .panel-head {
-    margin-top: 28px;
-  }
-
-  .course-outline {
-    max-height: calc(100svh - 92px);
-    overflow: auto;
-  }
-
-  .player-stage:fullscreen .player-controls {
-    padding: 76px 14px 18px;
-  }
-
-  .player-stage:fullscreen .player-meta-row,
-  .player-stage:fullscreen .timeline,
-  .player-stage:fullscreen .control-bar {
-    width: calc(100vw - 28px);
-  }
 }
