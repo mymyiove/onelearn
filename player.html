@@ -12,6 +12,13 @@
 </head>
 
 <body>
+  <div class="ambient-bg">
+    <span>🎓</span>
+    <span>🚀</span>
+    <span>🌱</span>
+    <span>✨</span>
+  </div>
+
   <div id="playerLoader" class="player-loader" aria-live="polite">
     <div class="loader-card">
       <div class="loader-orbit" aria-hidden="true">
@@ -67,8 +74,6 @@
         <div class="course-detail-content">
           <p id="courseDesc">학습 기록과 수료 조건을 확인하고 있습니다.</p>
 
-          <div id="courseDetailChips" class="course-detail-chips" aria-label="과정 상세 조건"></div>
-
           <div class="course-extra-grid">
             <div>
               <span>강사</span>
@@ -105,11 +110,9 @@
             <span>전체 진행률</span>
             <strong id="courseProgressText">0%</strong>
           </div>
-
           <div class="mini-track">
             <i id="courseTrackFill"></i>
           </div>
-
           <p id="chapterProgressText">총 챕터 0개 중 0개 완료</p>
         </div>
 
@@ -126,13 +129,8 @@
           <div id="videoWrap" class="video-wrap">
             <video id="video" preload="metadata" playsinline></video>
 
-            <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">
-              ×
-            </button>
-
-            <div id="videoCenterHint" class="video-center-hint" aria-hidden="true">
-              ▶
-            </div>
+            <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
+            <div id="videoCenterHint" class="video-center-hint" aria-hidden="true">▶</div>
 
             <div id="videoOverlay" class="video-overlay hidden">
               <strong>✅ 챕터 학습 조건을 충족했습니다</strong>
@@ -157,9 +155,7 @@
 
             <div class="control-bar" aria-label="영상 컨트롤">
               <div class="control-left">
-                <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">
-                  ▶
-                </button>
+                <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">▶</button>
 
                 <label class="rate-select" aria-label="재생 속도">
                   <select id="rateSelect">
@@ -171,9 +167,7 @@
                   </select>
                 </label>
 
-                <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">
-                  CC
-                </button>
+                <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">CC</button>
               </div>
 
               <div class="control-right">
@@ -181,13 +175,8 @@
                   <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
                 </label>
 
-                <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환">
-                  ↻
-                </button>
-
-                <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">
-                  ⛶
-                </button>
+                <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환">↻</button>
+                <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">⛶</button>
               </div>
             </div>
           </div>
@@ -204,11 +193,9 @@
   <div id="helpOverlay" class="notice-overlay hidden">
     <section class="notice-modal help-modal">
       <button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button>
-
       <div class="modal-icon">🛠️</div>
       <p class="eyebrow">재생 문제 해결 가이드</p>
       <h2>재생에 문제가 있나요?</h2>
-
       <ol>
         <li>최신 Chrome 또는 Edge 사용을 권장합니다.</li>
         <li>사내망, VPN, 보안 프로그램이 영상 도메인을 차단할 수 있습니다.</li>
@@ -219,7 +206,6 @@
         <li>모바일에서는 저전력 모드, 데이터 절약 모드, 백그라운드 앱을 끄면 안정적입니다.</li>
         <li>계속 문제가 있으면 과정명, 챕터명, 브라우저명, 발생 시간을 함께 전달해주세요.</li>
       </ol>
-
       <p>위 가이드로도 해결이 안 되면 <strong>jhj11@wjthinkbig.com</strong> 으로 메일 주세요.</p>
     </section>
   </div>
@@ -228,7 +214,6 @@
     <section class="confirm-box">
       <h2>챕터를 이동할까요?</h2>
       <p id="confirmText">다음 챕터로 이동합니다.</p>
-
       <div>
         <button id="confirmCancel" class="ghost-button" type="button">취소</button>
         <button id="confirmOk" class="primary-button" type="button">이동</button>
@@ -241,14 +226,9 @@
       <div class="identity-icon">🧑‍💻</div>
       <h2>본인 확인이 필요합니다</h2>
       <p>확인 후 자동으로 이어서 재생됩니다.</p>
-
       <div id="identityCode" class="identity-code">LEARN</div>
       <input id="identityInput" placeholder="위 문구 입력">
-
-      <button id="identitySubmitBtn" class="primary-button" type="button">
-        확인 완료
-      </button>
-
+      <button id="identitySubmitBtn" class="primary-button" type="button">확인 완료</button>
       <p id="identityMessage" class="form-message"></p>
     </section>
   </div>
@@ -258,7 +238,6 @@
       <a href="https://wjtb.odoo.com" target="_blank" rel="noopener">
         <img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne">
       </a>
-
       <p class="footer-desc">
         OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>
         © 2026 Woongjin Thinkbig, Hugh.
