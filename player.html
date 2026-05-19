@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>OneLearn 플레이어</title>
-
   <link rel="icon" href="./src/img/Favicon.png">
   <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="./src/css/common.css">
@@ -44,29 +43,44 @@
   </header>
 
   <main class="player-shell">
-    <section class="player-title glass-card">
-      <div class="course-title-main">
-        <div>
+    <section class="course-hero glass-card">
+      <div class="course-hero-main">
+        <div class="course-hero-copy">
           <h1 id="courseTitle">과정을 불러오는 중입니다</h1>
+          <div id="coursePolicyChips" class="course-policy-chips"></div>
         </div>
+
         <button id="courseDetailToggle" class="soft-button" type="button">자세히 &gt;</button>
       </div>
 
       <div id="courseDetailPanel" class="course-detail-panel hidden">
-        <p id="courseDesc">학습 기록과 수료 조건을 확인하고 있습니다.</p>
+        <div id="courseThumbnailBox" class="course-thumbnail-box">
+          <div class="course-thumbnail-fallback">
+            <span>OneLearn</span>
+            <strong>Learning Course</strong>
+          </div>
+        </div>
 
-        <div class="course-extra-grid">
-          <div>
-            <span>강사</span>
-            <strong id="instructorText">-</strong>
-          </div>
-          <div>
-            <span>마감일</span>
-            <strong id="dueDateText">-</strong>
-          </div>
-          <div>
-            <span>카테고리</span>
-            <strong id="categoryText">-</strong>
+        <div class="course-detail-content">
+          <p id="courseDesc">학습 기록과 수료 조건을 확인하고 있습니다.</p>
+
+          <div class="course-extra-grid">
+            <div>
+              <span>강사</span>
+              <strong id="instructorText">-</strong>
+            </div>
+            <div>
+              <span>마감일</span>
+              <strong id="dueDateText">-</strong>
+            </div>
+            <div>
+              <span>카테고리</span>
+              <strong id="categoryText">-</strong>
+            </div>
+            <div>
+              <span>완료 기준</span>
+              <strong id="detailCompletionText">-</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -92,8 +106,6 @@
           </div>
         </div>
 
-        <div id="policyChips" class="policy-chips"></div>
-
         <div id="playerStage" class="player-stage controls-visible">
           <div id="videoWrap" class="video-wrap">
             <video id="video" preload="metadata" playsinline></video>
@@ -108,46 +120,42 @@
             </div>
           </div>
 
-          <div class="player-meta-row">
-            <strong id="timeText">00:00 / 00:00 · 0%</strong>
-            <span id="saveStatusText">학습 위치 저장 대기</span>
-          </div>
+          <div class="player-controls">
+            <div class="player-meta-row">
+              <strong id="timeText">00:00 / 00:00 · 0%</strong>
 
-          <div id="timeline" class="timeline" aria-label="영상 진행률">
-            <span id="timelineFill"></span>
-            <i id="identityMarker" class="identity-marker hidden"></i>
-          </div>
-
-          <div class="control-bar" aria-label="영상 컨트롤">
-            <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">▶</button>
-
-            <label class="rate-select" aria-label="재생 속도">
-              <select id="rateSelect">
-                <option value="0.75">0.75x</option>
-                <option value="1" selected>1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="2">2x</option>
-              </select>
-            </label>
-
-            <label class="volume-control" aria-label="음량 조절">
-              <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
-            </label>
-
-            <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">CC</button>
-            <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">⛶</button>
-          </div>
-
-          <div class="chapter-nav-bar" aria-label="챕터 이동">
-            <button id="prevChapterControl" class="chapter-nav-button" type="button">‹ 이전</button>
-
-            <div class="chapter-nav-center">
-              <span id="chapterIndexText">챕터 1 / 1</span>
-              <strong id="chapterNavTitle">챕터를 선택해주세요</strong>
+              <div class="chapter-inline-nav" aria-label="챕터 이동">
+                <button id="prevChapterControl" type="button" aria-label="이전 챕터">‹</button>
+                <span id="chapterIndexText">1 / 1</span>
+                <button id="nextChapterControl" type="button" aria-label="다음 챕터">›</button>
+              </div>
             </div>
 
-            <button id="nextChapterControl" class="chapter-nav-button" type="button">다음 ›</button>
+            <div id="timeline" class="timeline" aria-label="영상 진행률">
+              <span id="timelineFill"></span>
+              <i id="identityMarker" class="identity-marker hidden"></i>
+            </div>
+
+            <div class="control-bar" aria-label="영상 컨트롤">
+              <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">▶</button>
+
+              <label class="rate-select" aria-label="재생 속도">
+                <select id="rateSelect">
+                  <option value="0.75">0.75x</option>
+                  <option value="1" selected>1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2">2x</option>
+                </select>
+              </label>
+
+              <label class="volume-control" aria-label="음량 조절">
+                <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
+              </label>
+
+              <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">CC</button>
+              <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">⛶</button>
+            </div>
           </div>
         </div>
 
