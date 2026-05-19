@@ -4,20 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>OneLearn 플레이어</title>
+
   <link rel="icon" href="./src/img/Favicon.png">
-  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="./src/css/common.css">
   <link rel="stylesheet" href="./src/css/player.css">
 </head>
 
 <body>
-  <div class="ambient-bg">
-    <span>🎓</span>
-    <span>🚀</span>
-    <span>🌱</span>
-    <span>✨</span>
-  </div>
 
+  <!-- Loader -->
   <div id="playerLoader" class="player-loader">
     <div class="loader-card">
       🎬
@@ -25,35 +21,56 @@
     </div>
   </div>
 
+  <!-- Header -->
   <header class="site-header player-header">
-    <div class="header-inner player-header-inner">
-      <a class="brand-text" href="./dashboard.html?tenant=woongjin">
-        <span>OneLearn</span>
-        <span class="brand-dot"></span>
+    <div class="header-inner">
+
+      <a href="./dashboard.html?tenant=woongjin" class="brand-text">
+        OneLearn <span class="brand-dot"></span>
       </a>
 
       <div class="header-spacer"></div>
 
       <div class="player-user">
-        <strong id="welcomeText">확인 중입니다</strong>
-        <a id="dashboardBtn" class="outline-button" href="./dashboard.html?tenant=woongjin">과정 목록</a>
-        <button id="chapterDrawerBtn" class="hamburger" type="button">챕터</button>
+        <strong id="welcomeText">확인 중</strong>
+
+        <a id="dashboardBtn" href="#" class="outline-button">
+          과정 목록
+        </a>
+
+        <button id="chapterDrawerBtn" class="hamburger" type="button">
+          챕터
+        </button>
       </div>
+
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="player-shell">
+
+    <!-- ✅ 과정 카드 -->
     <section class="course-hero glass-card">
+
       <div class="course-hero-main">
-        <div class="course-hero-copy">
-          <h1 id="courseTitle">과정을 불러오는 중입니다</h1>
+
+        <div class="course-hero-left">
+          <h1 id="courseTitle">과정 불러오는 중</h1>
+
+          <!-- ✅ 배지 (마감일 맨 앞) -->
           <div id="coursePolicyChips" class="course-policy-chips"></div>
         </div>
 
-        <button id="courseDetailToggle" class="soft-button" type="button">자세히 &gt;</button>
+        <button id="courseDetailToggle" class="soft-button" type="button">
+          자세히 >
+        </button>
+
       </div>
 
+      <!-- ✅ 상세 영역 -->
       <div id="courseDetailPanel" class="course-detail-panel hidden">
+
+        <!-- 썸네일 -->
         <div id="courseThumbnailBox" class="course-thumbnail-box">
           <div class="course-thumbnail-fallback">
             <span>OneLearn</span>
@@ -61,8 +78,9 @@
           </div>
         </div>
 
+        <!-- 설명 -->
         <div class="course-detail-content">
-          <p id="courseDesc">학습 기록과 수료 조건을 확인하고 있습니다.</p>
+          <p id="courseDesc">설명 불러오는 중</p>
 
           <div class="course-extra-grid">
             <div>
@@ -83,63 +101,84 @@
             </div>
           </div>
         </div>
+
       </div>
+
     </section>
 
+
+    <!-- ✅ 메인 레이아웃 (2열) -->
     <section class="player-main">
+
+      <!-- ✅ 좌측 (챕터 + 진행현황 통합) -->
       <aside id="chapterDrawer" class="chapter-panel glass-card">
-        <button id="chapterDrawerClose" class="drawer-close" type="button" aria-label="챕터 목록 닫기">×</button>
+
+        <button id="chapterDrawerClose" class="drawer-close">×</button>
 
         <div class="panel-head">
           <h2>📚 챕터</h2>
           <span id="chapterCountBadge">0개</span>
         </div>
 
-        <div id="courseOutline" class="course-outline"></div>
-      </aside>
-
-      <section class="video-panel glass-card">
-        <div class="video-top">
-          <div>
-            <h2 id="chapterTitle">챕터를 선택해주세요</h2>
-            <p id="chapterDesc">학습할 챕터 정보를 불러오는 중입니다.</p>
+        <!-- ✅ 전체 진행률 -->
+        <div class="drawer-progress">
+          <strong id="courseProgressText">0%</strong>
+          <div class="mini-track">
+            <i id="courseTrackFill"></i>
           </div>
+          <p id="chapterProgressText">0 / 0 완료</p>
         </div>
 
-        <div id="playerStage" class="player-stage controls-visible">
-          <div id="videoWrap" class="video-wrap">
-            <video id="video" preload="metadata" playsinline></video>
+        <div id="courseOutline" class="course-outline"></div>
 
-            <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
+      </aside>
+
+
+      <!-- ✅ VIDEO -->
+      <section class="video-panel glass-card">
+
+        <!-- 챕터 정보 -->
+        <div class="video-top">
+          <h2 id="chapterTitle">챕터 제목</h2>
+          <p id="chapterDesc">설명</p>
+        </div>
+
+        <!-- PLAYER -->
+        <div id="playerStage" class="player-stage controls-visible">
+
+          <div id="videoWrap" class="video-wrap">
+            <video id="video" playsinline preload="metadata"></video>
 
             <div id="videoCenterHint" class="video-center-hint">▶</div>
-
-            <div id="videoOverlay" class="video-overlay hidden">
-              <strong>✅ 챕터 학습 조건을 충족했습니다</strong>
-              <p>오른쪽 위 X를 누르면 다시 볼 수 있습니다.</p>
-            </div>
           </div>
 
+          <!-- ✅ 컨트롤 -->
           <div class="player-controls">
+
+            <!-- ✅ 시간 + 챕터 이동 -->
             <div class="player-meta-row">
+
               <strong id="timeText">00:00 / 00:00 · 0%</strong>
 
-              <div class="chapter-inline-nav" aria-label="챕터 이동">
-                <button id="prevChapterControl" type="button" aria-label="이전 챕터">‹</button>
+              <div class="chapter-inline-nav">
+                <button id="prevChapterControl">‹</button>
                 <span id="chapterIndexText">1 / 1</span>
-                <button id="nextChapterControl" type="button" aria-label="다음 챕터">›</button>
+                <button id="nextChapterControl">›</button>
               </div>
+
             </div>
 
-            <div id="timeline" class="timeline" aria-label="영상 진행률">
+            <!-- 진행바 -->
+            <div id="timeline" class="timeline">
               <span id="timelineFill"></span>
-              <i id="identityMarker" class="identity-marker hidden"></i>
             </div>
 
-            <div class="control-bar" aria-label="영상 컨트롤">
-              <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">▶</button>
+            <!-- ✅ 컨트롤바 -->
+            <div class="control-bar">
 
-              <label class="rate-select" aria-label="재생 속도">
+              <button id="playBtn" class="play-control">▶</button>
+
+              <label class="rate-select">
                 <select id="rateSelect">
                   <option value="0.75">0.75x</option>
                   <option value="1" selected>1x</option>
@@ -149,126 +188,54 @@
                 </select>
               </label>
 
-              <label class="volume-control" aria-label="음량 조절">
+              <label class="volume-control">
                 <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
               </label>
 
-              <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">CC</button>
-              <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">⛶</button>
+              <button id="ccBtn" class="icon-control">CC</button>
+
+              <!-- ✅ 회전 버튼 (전체화면에서만 사용) -->
+              <button id="rotateBtn" class="icon-control rotate-btn hidden">↻</button>
+
+              <button id="fullscreenBtn" class="icon-control">⛶</button>
+
             </div>
+
           </div>
+
         </div>
 
-        <p id="playerHint" class="player-hint">
-          화면 탭: 재생/일시정지 · 더블탭: 전체화면
-          <button id="helpBtn" class="help-link" type="button">문제가 있나요?</button>
-        </p>
       </section>
 
-      <aside class="right-study-panel">
-        <div class="completion-card glass-card">
-          <h2>📊 전체 진행률</h2>
-          <strong id="courseProgressText">0%</strong>
-          <div class="mini-track">
-            <i id="courseTrackFill"></i>
-          </div>
-          <p id="chapterProgressText">총 챕터 0개 중 0개 완료</p>
-        </div>
-
-        <section class="policy-panel glass-card">
-          <h2>🏅 수료 기준</h2>
-
-          <dl>
-            <div>
-              <dt>배속</dt>
-              <dd id="policyRate">-</dd>
-            </div>
-            <div>
-              <dt>앞으로 이동</dt>
-              <dd id="policySeek">-</dd>
-            </div>
-            <div>
-              <dt>본인확인</dt>
-              <dd id="policyIdentity">-</dd>
-            </div>
-            <div>
-              <dt>완료 기준</dt>
-              <dd id="policyCourseProgress">-</dd>
-            </div>
-            <div>
-              <dt>다음 챕터</dt>
-              <dd id="policyNext">-</dd>
-            </div>
-          </dl>
-
-          <div class="due-box">
-            <span>⏰ 마감일</span>
-            <strong id="policyDueDate">-</strong>
-          </div>
-        </section>
-      </aside>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner compact">
-      <a href="https://wjtb.odoo.com" target="_blank" rel="noopener">
-        <img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne">
-      </a>
-      <p class="footer-desc">
-        OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>
-        © 2026 Woongjin Thinkbig, Hugh.
-      </p>
-    </div>
-  </footer>
 
-  <div id="helpOverlay" class="notice-overlay hidden">
-    <section class="notice-modal help-modal">
-      <button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button>
-      <div class="modal-icon">🛠️</div>
-      <p class="eyebrow">재생 문제 해결 가이드</p>
-      <h2>재생에 문제가 있나요?</h2>
-
-      <ol>
-        <li>최신 Chrome 또는 Edge 사용을 권장합니다.</li>
-        <li>사내망, VPN, 보안 프로그램이 영상 도메인을 차단할 수 있습니다.</li>
-        <li>브라우저 새로고침 후 다시 재생해보세요.</li>
-        <li>브라우저 탭 음소거, OS 볼륨, 이어폰/스피커 연결 상태를 확인하세요.</li>
-        <li>영상이 끊기면 다른 탭/프로그램을 종료하고 네트워크를 확인하세요.</li>
-        <li>전체화면이 안 되면 브라우저 권한 또는 팝업/보안 정책을 확인하세요.</li>
-        <li>모바일에서는 저전력 모드, 데이터 절약 모드, 백그라운드 앱을 끄면 안정적입니다.</li>
-        <li>계속 문제가 있으면 과정명, 챕터명, 브라우저명, 발생 시간을 함께 전달해주세요.</li>
-      </ol>
-
-      <p>위 가이드로도 해결이 안 되면 <strong>jhj11@wjthinkbig.com</strong> 으로 메일 주세요.</p>
-    </section>
-  </div>
-
+  <!-- ✅ 모달 -->
   <div id="confirmOverlay" class="confirm-overlay hidden">
     <section class="confirm-box">
-      <h2>챕터를 이동할까요?</h2>
-      <p id="confirmText">다음 챕터로 이동합니다.</p>
+      <h2>챕터 이동</h2>
+      <p id="confirmText">이동하시겠습니까?</p>
       <div>
-        <button id="confirmCancel" class="ghost-button" type="button">취소</button>
-        <button id="confirmOk" class="primary-button" type="button">이동</button>
+        <button id="confirmCancel">취소</button>
+        <button id="confirmOk">이동</button>
       </div>
     </section>
   </div>
 
   <div id="identityModal" class="identity-modal hidden">
     <section class="identity-box">
-      <div class="identity-icon">🧑‍💻</div>
-      <h2>본인 확인이 필요합니다</h2>
-      <p>확인 후 자동으로 이어서 재생됩니다.</p>
-      <div id="identityCode" class="identity-code">LEARN</div>
-      <input id="identityInput" placeholder="위 문구 입력">
-      <button id="identitySubmitBtn" class="primary-button" type="button">확인 완료</button>
-      <p id="identityMessage" class="form-message"></p>
+      <h2>본인 확인</h2>
+      <div id="identityCode">LEARN</div>
+      <input id="identityInput" placeholder="입력">
+      <button id="identitySubmitBtn">확인</button>
+      <p id="identityMessage"></p>
     </section>
   </div>
 
   <script src="./src/js/config.js"></script>
   <script src="./src/js/storage.js"></script>
   <script src="./src/js/player.js"></script>
+
 </body>
 </html>
