@@ -1,475 +1,94 @@
-.player-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: radial-gradient(circle at center, #fff, #f3f4f8);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: opacity .4s ease;
-}
-
-.player-loader.done {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 카드 */
-
-.loader-card {
-  text-align: center;
-}
-
-/* 돌아가는 이모지 */
-
-.loader-icon {
-  font-size: 48px;
-  animation: spin 1.2s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-
-/* 텍스트 */
-
-.loader-card h1 {
-  margin-top: 14px;
-  font-size: 20px;
-}
-
-/* ✅ 프로그레스 바 */
-
-.loader-bar {
-  width: 160px;
-  height: 6px;
-  margin-top: 12px;
-  background: #eee;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.loader-bar i {
-  display: block;
-  height: 100%;
-  width: 40%;
-  background: linear-gradient(90deg,#F47721,#ff9b50);
-  animation: loadBar 1s infinite;
-}
-
-@keyframes loadBar {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(300%); }
-}
-
-
-
-/* 기본 */
-
 body {
-  margin: 0;
-  font-family: 'Pretendard', sans-serif;
-  background: #f6f7fb;
+  margin:0;
+  background:#111;
+  color:#fff;
+  font-family:sans-serif;
 }
 
-.glass-card {
-  background: rgba(255,255,255,.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,.7);
-  border-radius: 26px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.05);
+/* 로딩 */
+#loader {
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  background:#000;
+  z-index:100;
 }
 
-/* 레이아웃 */
-
-.player-shell {
-  width: min(1280px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 20px 0;
+/* 플레이어 */
+.player {
+  width:900px;
+  margin:40px auto;
 }
 
-.player-main {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 16px;
-}
-
-/* ✅ 과정 카드 */
-
-.course-hero {
-  padding: 24px;
-  margin-bottom: 16px;
-}
-
-.course-hero-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.course-hero-left h1 {
-  margin: 0;
-  font-size: 32px;
-}
-
-.course-policy-chips {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.course-policy-chip {
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  background: #ffe8db;
-  color: #d55a00;
-}
-
-/* ✅ 헬조 중요: 마감일 강조 */
-
-.course-policy-chip.deadline {
-  background: #ff4d4f;
-  color: #fff;
-}
-
-/* 상세 */
-
-.course-detail-panel {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 16px;
-}
-
-.course-thumbnail-box {
-  border-radius: 20px;
-  overflow: hidden;
-  background: #fff3ea;
-  min-height: 120px;
-}
-
-.course-thumbnail-fallback {
-  padding: 14px;
-  display: grid;
-  justify-content: end;
-}
-
-.course-extra-grid {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 10px;
-}
-
-.course-extra-grid div {
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: #fafafa;
-  display: flex;
-  justify-content: space-between;
-}
-
-/* ✅ 좌측 드로어 */
-
-.chapter-panel {
-  padding: 16px;
-}
-
-.drawer-progress {
-  margin: 14px 0 16px;
-}
-
-.drawer-progress strong {
-  font-size: 28px;
-}
-
-.mini-track {
-  height: 6px;
-  background: #eee;
-  border-radius: 999px;
-  margin-top: 6px;
-}
-
-.mini-track i {
-  display: block;
-  height: 100%;
-  background: #F47721;
-}
-
-/* 챕터 버튼 */
-
-.course-outline {
-  display: grid;
-  gap: 8px;
-}
-
-.chapter-button {
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid #eee;
-  background: #fff;
-  font-size: 13px;
-  text-align: left;
-}
-
-.chapter-button.active {
-  background: #fff3ea;
-  border-color: #f47721;
-}
-
-/* ✅ 영상 영역 */
-
-.video-panel {
-  padding: 18px;
-}
-
-.video-top h2 {
-  margin: 0;
-  font-size: 22px;
-}
-
-.video-top p {
-  margin: 6px 0 12px;
-  color: #666;
-}
-
+/* video */
 .video-wrap {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #000;
-  aspect-ratio: 16 / 9;
+  position:relative;
+  background:#000;
+  aspect-ratio:16/9;
 }
 
 video {
-  width: 100%;
-  height: 100%;
+  width:100%;
+  height:100%;
 }
 
-/* ✅ 컨트롤 */
-
-.player-controls {
-  margin-top: 10px;
-  display: grid;
-  gap: 8px;
+#centerHint {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:40px;
 }
 
-/* meta (시간 + 챕터) */
-
-.player-meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* 컨트롤 */
+.controls {
+  padding:10px;
 }
 
-.chapter-inline-nav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+/* 상단 */
+.top {
+  display:flex;
+  justify-content:space-between;
 }
 
-.chapter-inline-nav button {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1px solid #ddd;
-  background: #fff;
+/* 바 */
+.bar {
+  height:6px;
+  background:#444;
+  margin:10px 0;
+  cursor:pointer;
 }
 
-/* 타임라인 */
-
-.timeline {
-  height: 8px;
-  background: #eee;
-  border-radius: 999px;
-  cursor: pointer;
-  position: relative;
+.bar i {
+  display:block;
+  height:100%;
+  background:#f60;
+  width:0;
 }
 
-.timeline span {
-  height: 100%;
-  background: #F47721;
-  display: block;
-  width: 0;
-  border-radius: 999px;
+/* 하단 */
+.bottom {
+  display:flex;
+  justify-content:space-between;
 }
 
-/* ✅ 컨트롤바 핵심 */
-
-.control-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* LEFT */
+.left {
+  display:flex;
+  gap:6px;
 }
 
-/* 재생 */
-
-.play-control {
-  width: 56px;
-  height: 44px;
+/* RIGHT */
+.right {
+  display:flex;
+  gap:6px;
 }
 
-/* 배속 */
-
-.rate-select {
-  width: 80px;
-}
-
-/* ✅ 볼륨 (제한된 크기!!) */
-
-.volume-control {
-  flex: 0 0 150px;
-}
-
-.volume-control input {
-  width: 100%;
-}
-
-/* 버튼 */
-
-.icon-control {
-  width: 46px;
-  height: 44px;
-}
-
-/* ✅ 회전버튼 */
-
-.rotate-btn {
-  font-size: 14px;
-}
-
-/* ✅ 전체화면 */
-
-.player-stage:fullscreen {
-  background: #000;
-}
-
-.player-stage:fullscreen .video-wrap {
-  position: absolute;
-  inset: 0;
-  aspect-ratio: auto;
-}
-
-.player-stage:fullscreen video {
-  object-fit: contain;
-}
-
-/* ✅ 오버레이 컨트롤 */
-
-.player-stage:fullscreen .player-controls {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  padding: 24px;
-  background: linear-gradient(to top, rgba(0,0,0,.8), transparent);
-
-  transition: .2s;
-}
-
-/* 컨트롤 숨김 */
-
-.player-stage:not(.controls-visible):fullscreen .player-controls {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 전체화면 전용 스타일 */
-
-.player-stage:fullscreen .player-meta-row strong {
-  color: #fff;
-}
-
-.player-stage:fullscreen .chapter-inline-nav,
-.player-stage:fullscreen .control-bar button,
-.player-stage:fullscreen .rate-select,
-.player-stage:fullscreen .volume-control {
-  background: rgba(255,255,255,.9);
-}
-
-/* ✅ 모바일 */
-
-@media (max-width: 760px) {
-
-  .player-main {
-    grid-template-columns: 1fr;
-  }
-
-  .course-hero {
-    padding: 16px;
-  }
-
-  .course-hero-left h1 {
-    font-size: 22px;
-  }
-
-  /* ✅ 모바일: 배지 숨김 (마감일 제외 → JS에서 처리) */
-
-  .course-policy-chips {
-    flex-wrap: nowrap;
-    overflow: hidden;
-  }
-
-  .course-detail-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .video-panel {
-    padding: 14px;
-  }
-
-  /* ✅ 컨트롤 축소 */
-
-  .play-control {
-    width: 48px;
-    height: 42px;
-  }
-
-  .rate-select {
-    width: 64px;
-  }
-
-  .volume-control {
-    flex: 1;
-    min-width: 80px;
-    max-width: 120px;
-  }
-
-  .icon-control {
-    width: 42px;
-    height: 42px;
-  }
-
-}
-
-/* ✅ 드로어 (모바일) */
-
-@media (max-width: 760px) {
-
-  .chapter-panel {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 85vw;
-    transform: translateX(-100%);
-    transition: .3s;
-    z-index: 999;
-  }
-
-  .chapter-panel.open {
-    transform: translateX(0);
-    box-shadow: 0 0 0 999px rgba(0,0,0,.4);
-  }
-
+/* FULLSCREEN */
+.player:fullscreen {
+  width:100%;
+  height:100%;
 }
