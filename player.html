@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./src/css/common.css">
   <link rel="stylesheet" href="./src/css/player.css">
 </head>
+
 <body>
   <div class="ambient-bg">
     <span>🎓</span>
@@ -47,7 +48,7 @@
         <div>
           <h1 id="courseTitle">과정을 불러오는 중입니다</h1>
         </div>
-        <button id="courseDetailToggle" class="soft-button">자세히 &gt;</button>
+        <button id="courseDetailToggle" class="soft-button" type="button">자세히 &gt;</button>
       </div>
 
       <div id="courseDetailPanel" class="course-detail-panel hidden">
@@ -72,7 +73,7 @@
 
     <section class="player-main">
       <aside id="chapterDrawer" class="chapter-panel glass-card">
-        <button id="chapterDrawerClose" class="drawer-close">×</button>
+        <button id="chapterDrawerClose" class="drawer-close" type="button" aria-label="챕터 목록 닫기">×</button>
 
         <div class="panel-head">
           <h2>📚 챕터</h2>
@@ -90,57 +91,78 @@
           </div>
         </div>
 
-        <div id="videoWrap" class="video-wrap">
-          <video id="video" preload="metadata" playsinline></video>
-          <button id="completeOverlayClose" class="overlay-close hidden">×</button>
-          <div id="videoCenterHint" class="video-center-hint">▶</div>
+        <div id="policyChips" class="policy-chips"></div>
 
-          <div id="videoOverlay" class="video-overlay hidden">
-            <strong>✅ 챕터 학습 조건을 충족했습니다</strong>
-            <p>오른쪽 위 X를 누르면 다시 볼 수 있습니다.</p>
+        <div id="playerStage" class="player-stage controls-visible">
+          <div id="videoWrap" class="video-wrap">
+            <video id="video" preload="metadata" playsinline></video>
+
+            <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
+
+            <div id="videoCenterHint" class="video-center-hint">▶</div>
+
+            <div id="videoOverlay" class="video-overlay hidden">
+              <strong>✅ 챕터 학습 조건을 충족했습니다</strong>
+              <p>오른쪽 위 X를 누르면 다시 볼 수 있습니다.</p>
+            </div>
           </div>
-        </div>
 
-        <div class="time-row">
-          <span id="timeText">00:00 / 00:00 (0%)</span>
+          <div class="player-chrome">
+            <div class="playback-meta">
+              <strong id="timeText">00:00 / 00:00 · 0%</strong>
+              <span id="saveStatusText">학습 위치 저장 대기</span>
+            </div>
 
-          <div class="chapter-move-control" aria-label="챕터 이동">
-            <span>챕터 이동</span>
-            <button id="prevChapterControl" class="control-button icon-control" type="button">‹</button>
-            <button id="nextChapterControl" class="control-button icon-control" type="button">›</button>
+            <div id="timeline" class="timeline" aria-label="영상 진행률">
+              <span id="timelineFill"></span>
+              <i id="identityMarker" class="identity-marker hidden"></i>
+            </div>
+
+            <div class="control-bar" aria-label="영상 컨트롤">
+              <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지">
+                ▶
+              </button>
+
+              <label class="rate-select" aria-label="재생 속도">
+                <select id="rateSelect">
+                  <option value="0.75">0.75x</option>
+                  <option value="1" selected>1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2">2x</option>
+                </select>
+              </label>
+
+              <label class="volume-control" aria-label="음량 조절">
+                <span>음량</span>
+                <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
+              </label>
+
+              <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기">
+                CC
+              </button>
+
+              <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면">
+                ⛶
+              </button>
+            </div>
+
+            <div class="chapter-nav-bar" aria-label="챕터 이동">
+              <button id="prevChapterControl" class="chapter-nav-button" type="button">‹ 이전</button>
+
+              <div class="chapter-nav-center">
+                <span id="chapterIndexText">챕터 1 / 1</span>
+                <strong id="chapterNavTitle">챕터를 선택해주세요</strong>
+              </div>
+
+              <button id="nextChapterControl" class="chapter-nav-button" type="button">다음 ›</button>
+            </div>
           </div>
-        </div>
-
-        <div id="timeline" class="timeline">
-          <span id="timelineFill"></span>
-        </div>
-
-        <div class="control-bar">
-          <button id="playBtn" class="primary-button icon-control">▶</button>
-
-          <label class="rate-select">
-            <select id="rateSelect">
-              <option value="0.75">0.75x</option>
-              <option value="1" selected>1x</option>
-              <option value="1.25">1.25x</option>
-              <option value="1.5">1.5x</option>
-              <option value="2">2x</option>
-            </select>
-          </label>
-
-          <button id="muteBtn" class="control-button icon-control">🔊</button>
-
-          <label class="volume-control">
-            <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
-          </label>
-
-          <button id="ccBtn" class="control-button icon-control">CC</button>
-          <button id="fullscreenBtn" class="control-button icon-control">⛶</button>
         </div>
 
         <p id="playerHint" class="player-hint">
           화면 탭: 재생/일시정지 · 더블탭: 전체화면
-          <button id="helpBtn" class="help-link">문제가 있나요?</button>
+          <button id="helpBtn" class="help-link" type="button">문제가 있나요?</button>
         </p>
       </section>
 
@@ -203,7 +225,7 @@
 
   <div id="helpOverlay" class="notice-overlay hidden">
     <section class="notice-modal help-modal">
-      <button id="helpCloseBtn" class="icon-close">×</button>
+      <button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button>
       <div class="modal-icon">🛠️</div>
       <p class="eyebrow">재생 문제 해결 가이드</p>
       <h2>재생에 문제가 있나요?</h2>
@@ -228,8 +250,8 @@
       <h2>챕터를 이동할까요?</h2>
       <p id="confirmText">다음 챕터로 이동합니다.</p>
       <div>
-        <button id="confirmCancel" class="ghost-button">취소</button>
-        <button id="confirmOk" class="primary-button">이동</button>
+        <button id="confirmCancel" class="ghost-button" type="button">취소</button>
+        <button id="confirmOk" class="primary-button" type="button">이동</button>
       </div>
     </section>
   </div>
@@ -241,7 +263,7 @@
       <p>확인 후 자동으로 이어서 재생됩니다.</p>
       <div id="identityCode" class="identity-code">LEARN</div>
       <input id="identityInput" placeholder="위 문구 입력">
-      <button id="identitySubmitBtn" class="primary-button">확인 완료</button>
+      <button id="identitySubmitBtn" class="primary-button" type="button">확인 완료</button>
       <p id="identityMessage" class="form-message"></p>
     </section>
   </div>
