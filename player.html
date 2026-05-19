@@ -12,24 +12,20 @@
 </head>
 
 <body>
-  <!-- 로딩 -->
   <div id="playerLoader" class="player-loader" aria-live="polite">
     <div class="loader-card">
       <div class="loader-orbit" aria-hidden="true">
         <span class="loader-planet">🎬</span>
         <i></i>
       </div>
-
       <h1>플레이어 준비 중</h1>
       <p>학습 환경과 수료 조건을 확인하고 있어요.</p>
-
       <div class="loader-progress" aria-hidden="true">
         <span></span>
       </div>
     </div>
   </div>
 
-  <!-- 헤더 -->
   <header class="site-header player-header">
     <div class="header-inner player-header-inner">
       <a class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장으로 이동">
@@ -48,7 +44,6 @@
   </header>
 
   <main class="player-shell">
-    <!-- 과정 카드 -->
     <section class="course-hero glass-card">
       <div class="course-hero-main">
         <div class="course-hero-copy">
@@ -79,17 +74,14 @@
               <span>강사</span>
               <strong id="instructorText">-</strong>
             </div>
-
             <div>
               <span>마감일</span>
               <strong id="dueDateText">-</strong>
             </div>
-
             <div>
               <span>카테고리</span>
               <strong id="categoryText">-</strong>
             </div>
-
             <div>
               <span>완료 기준</span>
               <strong id="detailCompletionText">-</strong>
@@ -99,9 +91,7 @@
       </div>
     </section>
 
-    <!-- 본문 -->
     <section class="player-main">
-      <!-- 챕터 + 학습 현황 드로어 -->
       <aside id="chapterDrawer" class="chapter-panel glass-card" aria-label="챕터와 학습 현황">
         <button id="chapterDrawerClose" class="drawer-close" type="button" aria-label="챕터 창 닫기">×</button>
 
@@ -126,7 +116,6 @@
         <div id="courseOutline" class="course-outline"></div>
       </aside>
 
-      <!-- 영상 영역 -->
       <section class="video-panel glass-card">
         <div class="video-top">
           <h2 id="chapterTitle">챕터를 선택해주세요</h2>
@@ -151,7 +140,6 @@
             </div>
           </div>
 
-          <!-- 플레이어 컨트롤 -->
           <div class="player-controls">
             <div class="player-meta-row">
               <strong id="timeText">00:00 / 00:00 · 0%</strong>
@@ -213,7 +201,6 @@
     </section>
   </main>
 
-  <!-- 도움말 -->
   <div id="helpOverlay" class="notice-overlay hidden">
     <section class="notice-modal help-modal">
       <button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button>
@@ -237,7 +224,6 @@
     </section>
   </div>
 
-  <!-- 챕터 이동 확인 -->
   <div id="confirmOverlay" class="confirm-overlay hidden">
     <section class="confirm-box">
       <h2>챕터를 이동할까요?</h2>
@@ -250,7 +236,6 @@
     </section>
   </div>
 
-  <!-- 본인 확인 -->
   <div id="identityModal" class="identity-modal hidden">
     <section class="identity-box">
       <div class="identity-icon">🧑‍💻</div>
@@ -258,7 +243,6 @@
       <p>확인 후 자동으로 이어서 재생됩니다.</p>
 
       <div id="identityCode" class="identity-code">LEARN</div>
-
       <input id="identityInput" placeholder="위 문구 입력">
 
       <button id="identitySubmitBtn" class="primary-button" type="button">
@@ -269,7 +253,6 @@
     </section>
   </div>
 
-  <!-- 푸터 -->
   <footer class="site-footer">
     <div class="footer-inner compact">
       <a href="https://wjtb.odoo.com" target="_blank" rel="noopener">
