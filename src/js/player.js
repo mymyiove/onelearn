@@ -21,12 +21,13 @@ const els = {
   desc: $('courseDesc'),
   toggle: $('courseDetailToggle'),
   detail: $('courseDetailPanel'),
+  thumb: $('courseThumbnailBox'),
   inst: $('instructorText'),
   due: $('dueDateText'),
   cat: $('categoryText'),
+  detailCompletion: $('detailCompletionText'),
   policyDue: $('policyDueDate'),
-
-  policyChips: $('policyChips'),
+  policyChips: $('coursePolicyChips'),
 
   chCount: $('chapterCountBadge'),
   outline: $('courseOutline'),
@@ -43,7 +44,6 @@ const els = {
   overlayClose: $('completeOverlayClose'),
 
   time: $('timeText'),
-  saveStatus: $('saveStatusText'),
   timeline: $('timeline'),
   fill: $('timelineFill'),
   identityMarker: $('identityMarker'),
@@ -73,7 +73,6 @@ const els = {
   chapterTitle: $('chapterTitle'),
   chapterDesc: $('chapterDesc'),
   chapterIndex: $('chapterIndexText'),
-  chapterNavTitle: $('chapterNavTitle'),
 
   prev: $('prevChapterControl'),
   next: $('nextChapterControl'),
@@ -103,10 +102,6 @@ function key() {
 
 function save() {
   OneLearnStorage.write(key(), progress);
-
-  if (els.saveStatus) {
-    els.saveStatus.textContent = '저장됨';
-  }
 }
 
 function state(ch) {
@@ -130,11 +125,10 @@ function fmt(s) {
 }
 
 function fmtDate(d) {
-  const x = new Date(d + 'T00:00:00');
+  if (!d) return '마감 없음';
 
-  return d
-    ? `${String(x.getFullYear()).slice(2)}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')}`
-    : '마감 없음';
+  const x = new Date(d + 'T00:00:00');
+  return `${String(x.getFullYear()).slice(2)}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')}`;
 }
 
 function pol(ch) {
@@ -215,20 +209,29 @@ async function init() {
 }
 
 function renderBase() {
+  const p = course.completionPolicy || {};
+
   els.title.textContent = course.title;
   els.desc.textContent = course.description || '';
   els.inst.textContent = course.instructor?.name || 'OneLearn 전문 강사';
   els.due.textContent = els.policyDue.textContent = fmtDate(course.dueDate);
   els.cat.textContent = course.category || '-';
+  els.detailCompletion.textContent = `${p.requiredCourseProgressPercent || 95}% 이상`;
   els.chCount.textContent = `${chapters.length}개`;
-
-  const p = course.completionPolicy || {};
 
   els.policyCourse.textContent = `${p.requiredCourseProgressPercent || 95}% 이상`;
   els.policyRate.textContent = p.allowPlaybackRate === false ? '비허용' : '허용';
   els.policySeek.textContent = p.preventForwardSeeking ? '불가' : '가능';
   els.policyId.textContent = `${p.identityCheckCount || 0}회`;
   els.policyNext.textContent = course.playbackPolicy?.autoAdvanceNext ? '자동' : '수동';
+
+  if (course.thumbnail) {
+    els.thumb.classList.add('has-image');
+    els.thumb.style.backgroundImage = `url('${course.thumbnail}')`;
+  } else {
+    els.thumb.classList.remove('has-image');
+    els.thumb.style.backgroundImage = '';
+  }
 
   renderPolicyChips();
   renderOutline();
@@ -241,11 +244,10 @@ function renderPolicyChips() {
 
   if (p.preventForwardSeeking) chips.push('🔒 앞으로 이동 제한');
   if (p.identityCheckCount) chips.push(`🧑‍💻 본인확인 ${p.identityCheckCount}회`);
-  if (p.pauseWhenHidden) chips.push('👁 화면 이탈 감지');
   if (p.requiredActualWatchPercent) chips.push(`⏱ 실제 시청 ${p.requiredActualWatchPercent}%`);
   if (p.maxPlaybackRate) chips.push(`⚡ 최대 ${p.maxPlaybackRate}x`);
 
-  els.policyChips.innerHTML = chips.map(x => `<span class="policy-chip">${x}</span>`).join('');
+  els.policyChips.innerHTML = chips.map(x => `<span class="course-policy-chip">${x}</span>`).join('');
 }
 
 function renderOutline() {
@@ -317,8 +319,7 @@ function select(i) {
 
   els.chapterTitle.textContent = current.title;
   els.chapterDesc.textContent = current.description || '';
-  els.chapterIndex.textContent = `챕터 ${idx + 1} / ${chapters.length}`;
-  els.chapterNavTitle.textContent = current.title;
+  els.chapterIndex.textContent = `${idx + 1} / ${chapters.length}`;
 
   els.video.src = current.src;
   els.video.load();
@@ -477,7 +478,7 @@ function showControls() {
   if (document.fullscreenElement === els.stage && !els.video.paused) {
     controlsTimer = setTimeout(() => {
       els.stage.classList.remove('controls-visible');
-    }, 2600);
+    }, 2800);
   }
 }
 
@@ -590,7 +591,6 @@ els.timeline.onclick = e => {
   const p = pol(current);
 
   if (p.preventForwardSeeking && target > s.maxAllowedTime + 1.5 && !s.completed) {
-    els.saveStatus.textContent = '앞으로 이동 제한';
     showControls();
     return;
   }
@@ -626,13 +626,11 @@ els.volume.oninput = () => {
   els.video.volume = value;
   els.video.muted = value === 0;
 
-  els.saveStatus.textContent = value === 0 ? '음소거' : '음량 조정됨';
   showControls();
 };
 
 els.cc.onclick = () => {
   els.cc.classList.toggle('cc-on');
-  els.saveStatus.textContent = els.cc.classList.contains('cc-on') ? '자막 켜짐' : '자막 꺼짐';
   showControls();
 };
 
@@ -706,7 +704,6 @@ document.addEventListener('fullscreenchange', () => {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && current && pol(current).pauseWhenHidden) {
     els.video.pause();
-    els.saveStatus.textContent = '화면 이탈로 일시정지';
   }
 });
 
