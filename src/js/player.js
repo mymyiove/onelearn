@@ -89,6 +89,16 @@ let lastTickAt = null;
 let controlsTimer = null;
 let clickTimer = null;
 
+
+function finishLoading() {
+  if (els.loader) {
+    setTimeout(() => {
+      els.loader.classList.add('done');
+    }, 450);
+  }
+}
+
+
 function key() {
   return `progress:${session.userId}:${courseId}`;
 }
@@ -207,10 +217,7 @@ async function init() {
   renderBase();
   select(0);
 
-  setTimeout(() => {
-    els.loader.classList.add('done');
-  }, 450);
-}
+  finishLoading();
 
 function renderBase() {
   const p = course.completionPolicy || {};
