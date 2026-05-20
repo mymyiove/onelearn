@@ -27,9 +27,7 @@
       </div>
       <h1>플레이어 준비 중</h1>
       <p>학습 환경과 수료 조건을 확인하고 있어요.</p>
-      <div class="loader-progress" aria-hidden="true">
-        <span></span>
-      </div>
+      <div class="loader-progress" aria-hidden="true"><span></span></div>
     </div>
   </div>
 
@@ -115,11 +113,7 @@
             <span>전체 진행률</span>
             <strong id="courseProgressText">0%</strong>
           </div>
-
-          <div class="mini-track">
-            <i id="courseTrackFill"></i>
-          </div>
-
+          <div class="mini-track"><i id="courseTrackFill"></i></div>
           <p id="chapterProgressText">총 챕터 0개 중 0개 완료</p>
         </div>
 
@@ -134,13 +128,11 @@
         </div>
 
         <div id="playerStage" class="player-stage controls-visible">
-          <div id="videoWrap" class="video-wrap" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다." data-guide="4">
+          <div id="videoWrap" class="video-wrap" data-guide="4" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.">
             <span class="guide-badge">④</span>
-
             <video id="video" preload="metadata" playsinline webkit-playsinline></video>
 
             <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
-
             <div id="videoCenterHint" class="video-center-hint" aria-hidden="true">▶</div>
 
             <div id="videoOverlay" class="video-overlay hidden">
@@ -160,7 +152,7 @@
               </div>
             </div>
 
-            <div id="timeline" class="timeline" aria-label="영상 진행률" data-tip="진한 영역은 현재 재생 위치, 옅은 영역은 학습으로 인정되어 다시 이동 가능한 최대 위치입니다." data-guide="5">
+            <div id="timeline" class="timeline" aria-label="영상 진행률" data-guide="5" data-tip="진한 영역은 현재 재생 위치, 옅은 영역은 학습으로 인정되어 다시 이동 가능한 최대 위치입니다.">
               <span class="guide-badge">⑤</span>
               <span id="timelineAllowed" class="timeline-allowed"></span>
               <span id="timelineFill" class="timeline-fill"></span>
@@ -193,11 +185,21 @@
                 </label>
 
                 <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환" data-tip="모바일 전체화면에서 화면 방향 전환을 시도합니다.">↻</button>
-
                 <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면" data-tip="전체화면으로 전환합니다. 단축키: F">⛶</button>
               </div>
             </div>
           </div>
+
+          <div id="fullscreenChapterPrompt" class="fs-chapter-prompt hidden">
+            <strong id="fullscreenConfirmTitle">챕터를 이동할까요?</strong>
+            <p id="fullscreenConfirmText">다음 챕터로 이동합니다.</p>
+            <div>
+              <button id="fullscreenConfirmCancel" class="ghost-button" type="button">취소</button>
+              <button id="fullscreenConfirmOk" class="primary-button" type="button">이동</button>
+            </div>
+          </div>
+
+          <div id="playerToast" class="player-toast hidden" role="status"></div>
         </div>
 
         <p id="playerHint" class="player-hint" data-guide="7">
@@ -217,37 +219,23 @@
       <button id="usageCloseBtn" class="icon-close" type="button" aria-label="사용법 닫기">×</button>
       <div class="modal-icon">🎮</div>
       <p class="eyebrow">OneLearn 플레이어 사용법</p>
-      <h2>화면 번호를 따라 확인해보세요</h2>
+      <h2 id="usageStepTitle">① 과정 정보</h2>
+      <p id="usageStepText">과정명, 마감일, 핵심 수료 조건을 확인합니다.</p>
+
+      <div class="usage-step-actions">
+        <button id="usagePrevBtn" class="ghost-button" type="button">이전</button>
+        <span id="usageStepCount">1 / 7</span>
+        <button id="usageNextBtn" class="primary-button" type="button">다음</button>
+      </div>
 
       <div class="usage-grid">
-        <article>
-          <strong>① 과정 정보</strong>
-          <p>과정명, 마감일, 핵심 수료 조건을 확인합니다. 마감일은 항상 가장 앞에 표시됩니다.</p>
-        </article>
-        <article>
-          <strong>② 챕터와 전체 진행률</strong>
-          <p>챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.</p>
-        </article>
-        <article>
-          <strong>③ 현재 챕터 정보</strong>
-          <p>현재 학습 중인 챕터 제목과 설명을 확인합니다.</p>
-        </article>
-        <article>
-          <strong>④ 영상 영역</strong>
-          <p>한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p>
-        </article>
-        <article>
-          <strong>⑤ 진행바</strong>
-          <p>진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.</p>
-        </article>
-        <article>
-          <strong>⑥ 컨트롤바</strong>
-          <p>재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.</p>
-        </article>
-        <article>
-          <strong>⑦ 사용법과 문제 해결</strong>
-          <p>사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.</p>
-        </article>
+        <article><strong>① 과정 정보</strong><p>과정명, 마감일, 핵심 수료 조건을 확인합니다.</p></article>
+        <article><strong>② 챕터와 전체 진행률</strong><p>챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.</p></article>
+        <article><strong>③ 현재 챕터 정보</strong><p>현재 학습 중인 챕터 제목과 설명을 확인합니다.</p></article>
+        <article><strong>④ 영상 영역</strong><p>한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p></article>
+        <article><strong>⑤ 진행바</strong><p>진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.</p></article>
+        <article><strong>⑥ 컨트롤바</strong><p>재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.</p></article>
+        <article><strong>⑦ 사용법과 문제 해결</strong><p>사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.</p></article>
       </div>
     </section>
   </div>
