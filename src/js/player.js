@@ -10,6 +10,7 @@ const $ = id => document.getElementById(id);
 
 const els = {
   loader: $('playerLoader'),
+
   welcome: $('welcomeText'),
   dash: $('dashboardBtn'),
 
@@ -31,6 +32,7 @@ const els = {
 
   chCount: $('chapterCountBadge'),
   outline: $('courseOutline'),
+
   cPct: $('courseProgressText'),
   cFill: $('courseTrackFill'),
   chProg: $('chapterProgressText'),
@@ -66,6 +68,7 @@ const els = {
   chapterTitle: $('chapterTitle'),
   chapterDesc: $('chapterDesc'),
   chapterIndex: $('chapterIndexText'),
+
   prev: $('prevChapterControl'),
   next: $('nextChapterControl'),
 
@@ -89,15 +92,13 @@ let lastTickAt = null;
 let controlsTimer = null;
 let clickTimer = null;
 
-
 function finishLoading() {
-  if (els.loader) {
-    setTimeout(() => {
-      els.loader.classList.add('done');
-    }, 450);
-  }
-}
+  if (!els.loader) return;
 
+  setTimeout(() => {
+    els.loader.classList.add('done');
+  }, 450);
+}
 
 function key() {
   return `progress:${session.userId}:${courseId}`;
@@ -107,22 +108,22 @@ function save() {
   OneLearnStorage.write(key(), progress);
 }
 
-function fmt(s) {
-  s = Number(s || 0);
+function fmt(seconds) {
+  const s = Number(seconds || 0);
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 }
 
-function fmtDate(d) {
-  if (!d) return '마감 없음';
+function fmtDate(dateString) {
+  if (!dateString) return '마감 없음';
 
-  const x = new Date(d + 'T00:00:00');
-  return `${String(x.getFullYear()).slice(2)}.${String(x.getMonth() + 1).padStart(2, '0')}.${String(x.getDate()).padStart(2, '0')}`;
+  const date = new Date(`${dateString}T00:00:00`);
+  return `${String(date.getFullYear()).slice(2)}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
 }
 
-function remainText(d) {
-  if (!d) return '마감 없음';
+function remainText(dateString) {
+  if (!dateString) return '마감 없음';
 
-  const diff = Math.ceil((new Date(d + 'T23:59:59') - Date.now()) / 86400000);
+  const diff = Math.ceil((new Date(`${dateString}T23:59:59`) - Date.now()) / 86400000);
 
   if (diff > 0) return `D-${diff}`;
   if (diff === 0) return '오늘 마감';
@@ -130,19 +131,19 @@ function remainText(d) {
 }
 
 function isMobile() {
-  return matchMedia('(max-width:760px)').matches;
+  return window.matchMedia('(max-width:760px)').matches;
 }
 
-function pol(ch) {
+function pol(chapter) {
   return {
-    ...(course.completionPolicy || {}),
-    ...(ch?.completionPolicy || {})
+    ...(course?.completionPolicy || {}),
+    ...(chapter?.completionPolicy || {})
   };
 }
 
-function state(ch) {
-  if (!progress[ch.chapterId]) {
-    progress[ch.chapterId] = {
+function state(chapter) {
+  if (!progress[chapter.chapterId]) {
+    progress[chapter.chapterId] = {
       duration: 0,
       maxAllowedTime: 0,
       actualWatchSeconds: 0,
@@ -152,72 +153,96 @@ function state(ch) {
     };
   }
 
-  return progress[ch.chapterId];
+  return progress[chapter.chapterId];
 }
 
-function complete(ch) {
-  const s = state(ch);
-  const p = pol(ch);
-  const d = s.duration || els.video.duration || 0;
+function complete(chapter) {
+  const s = state(chapter);
+  const p = pol(chapter);
+  const duration = s.duration || els.video.duration || 0;
 
-  return d &&
-    s.maxAllowedTime / d * 100 >= Number(p.requiredProgressPercent || p.requiredCourseProgressPercent || 95) &&
-    s.actualWatchSeconds / d * 100 >= Number(p.requiredActualWatchPercent || 0) &&
-    Number(s.identityCheckCount || 0) >= Number(p.identityCheckCount || 0);
+  if (!duration) return false;
+
+  const positionPercent = (s.maxAllowedTime / duration) * 100;
+  const actualWatchPercent = (s.actualWatchSeconds / duration) * 100;
+
+  return (
+    positionPercent >= Number(p.requiredProgressPercent || p.requiredCourseProgressPercent || 95) &&
+    actualWatchPercent >= Number(p.requiredActualWatchPercent || 0) &&
+    Number(s.identityCheckCount || 0) >= Number(p.identityCheckCount || 0)
+  );
 }
 
 async function init() {
   try {
-    tenant = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/tenant.json`);
-  } catch {
-    tenant = {
-      tenantName: '웅진씽크빅',
-      brand: {
-        primaryColor: '#F47721'
-      }
+    try {
+      tenant = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/tenant.json`);
+    } catch {
+      tenant = {
+        tenantName: '웅진씽크빅',
+        displayName: 'OneLearn',
+        brand: {
+          primaryColor: '#F47721'
+        }
+      };
+    }
+
+    document.documentElement.style.setProperty('--brand', tenant.brand?.primaryColor || '#F47721');
+
+    try {
+      const learnerData = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/learners.json`);
+      learner = (learnerData.learners || []).find(x => x.userId === session.userId) || {
+        name: session.name || '학습자'
+      };
+    } catch {
+      learner = {
+        name: session.name || '학습자'
+      };
+    }
+
+    if (els.welcome) {
+      els.welcome.textContent = `${tenant.tenantName || tenant.displayName || 'OneLearn'} · ${learner.name} 님`;
+    }
+
+    if (els.dash) {
+      els.dash.href = `./dashboard.html?tenant=${tenantId}`;
+    }
+
+    const courseList = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/courses.json`);
+    const meta = (courseList.courses || []).find(x => x.courseId === courseId);
+
+    if (!meta) {
+      alert('과정을 찾을 수 없습니다.');
+      location.href = `./dashboard.html?tenant=${tenantId}`;
+      return;
+    }
+
+    const detail = await OneLearnStorage.fetchJson(meta.courseFile);
+    course = {
+      ...meta,
+      ...detail
     };
-  }
 
-  document.documentElement.style.setProperty('--brand', tenant.brand?.primaryColor || '#F47721');
+    chapters = course.chapters || [];
 
-  try {
-    const ld = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/learners.json`);
-    learner = (ld.learners || []).find(x => x.userId === session.userId) || { name: session.name || '학습자' };
-  } catch {
-    learner = { name: session.name || '학습자' };
-  }
+    if (!chapters.length) {
+      alert('등록된 챕터가 없습니다.');
+      location.href = `./dashboard.html?tenant=${tenantId}`;
+      return;
+    }
 
-  els.welcome.textContent = `${tenant.tenantName || tenant.displayName || 'OneLearn'} · ${learner.name} 님`;
-  els.dash.href = `./dashboard.html?tenant=${tenantId}`;
+    progress = OneLearnStorage.read(key(), {});
 
-  try {
-    const cl = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/courses.json`);
-    const m = (cl.courses || []).find(x => x.courseId === courseId);
-
-    if (!m) throw new Error('course not found');
-
-    const d = await OneLearnStorage.fetchJson(m.courseFile);
-    course = { ...m, ...d };
-  } catch {
+    renderBase();
+    select(0);
+  } catch (error) {
+    console.error('[OneLearn Player] init failed:', error);
     alert('과정 정보를 불러오지 못했습니다.');
     location.href = `./dashboard.html?tenant=${tenantId}`;
-    return;
+  } finally {
+    finishLoading();
   }
-
-  chapters = course.chapters || [];
-
-  if (!chapters.length) {
-    alert('등록된 챕터가 없습니다.');
-    location.href = `./dashboard.html?tenant=${tenantId}`;
-    return;
-  }
-
-  progress = OneLearnStorage.read(key(), {});
-
-  renderBase();
-  select(0);
-
-  finishLoading();
+}
 
 function renderBase() {
   const p = course.completionPolicy || {};
@@ -266,7 +291,7 @@ function renderPolicyChips() {
   const chips = buildChips();
 
   els.policyChips.innerHTML = chips
-    .map(c => `<span class="course-policy-chip ${c.cls || ''}">${c.label}</span>`)
+    .map(chip => `<span class="course-policy-chip ${chip.cls || ''}">${chip.label}</span>`)
     .join('');
 }
 
@@ -275,65 +300,67 @@ function renderOutline() {
 
   const sections = course.sections?.length
     ? course.sections
-    : [{
-        sectionId: 'sec-001',
-        title: '기본 섹션',
-        chapterIds: chapters.map(c => c.chapterId)
-      }];
+    : [
+        {
+          sectionId: 'sec-001',
+          title: '기본 섹션',
+          chapterIds: chapters.map(chapter => chapter.chapterId)
+        }
+      ];
 
-  sections.forEach((sec, si) => {
-    const box = document.createElement('section');
-    box.className = 'outline-section';
+  sections.forEach((section, sectionIndex) => {
+    const sectionEl = document.createElement('section');
+    sectionEl.className = 'outline-section';
 
-    box.innerHTML = `
+    sectionEl.innerHTML = `
       <button class="outline-toggle" type="button">
-        <span>섹션${si + 1}. ${sec.title}</span>
+        <span>섹션${sectionIndex + 1}. ${section.title}</span>
         <span class="outline-chevron">▾</span>
       </button>
       <div class="outline-body"></div>
     `;
 
-    box.querySelector('.outline-toggle').onclick = () => {
-      box.classList.toggle('collapsed');
+    sectionEl.querySelector('.outline-toggle').onclick = () => {
+      sectionEl.classList.toggle('collapsed');
     };
 
-    const body = box.querySelector('.outline-body');
+    const body = sectionEl.querySelector('.outline-body');
 
     chapters
-      .filter(ch => sec.chapterIds.includes(ch.chapterId))
-      .forEach(ch => {
-        const i = chapters.indexOf(ch);
-        const s = state(ch);
-        const d = s.duration || 0;
-        const r = d ? Math.min(100, s.maxAllowedTime / d * 100) : 0;
+      .filter(chapter => section.chapterIds.includes(chapter.chapterId))
+      .forEach(chapter => {
+        const chapterIndex = chapters.indexOf(chapter);
+        const chapterState = state(chapter);
+        const duration = chapterState.duration || 0;
+        const ratio = duration ? Math.min(100, (chapterState.maxAllowedTime / duration) * 100) : 0;
 
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = `chapter-button ${i === idx ? 'active' : ''}`;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `chapter-button ${chapterIndex === idx ? 'active' : ''}`;
 
-        b.innerHTML = `
-          <strong>${String(i + 1).padStart(2, '0')}. ${ch.title}</strong>
+        button.innerHTML = `
+          <strong>${String(chapterIndex + 1).padStart(2, '0')}. ${chapter.title}</strong>
           <div class="chapter-mini-progress">
-            <i style="width:${Math.round(r)}%"></i>
+            <i style="width:${Math.round(ratio)}%"></i>
           </div>
-          <span class="chapter-percent">${Math.round(r)}%</span>
+          <span class="chapter-percent">${Math.round(ratio)}%</span>
         `;
 
-        b.onclick = () => {
-          select(i);
+        button.onclick = () => {
+          select(chapterIndex);
           els.drawer.classList.remove('open');
         };
 
-        body.appendChild(b);
+        body.appendChild(button);
       });
 
-    els.outline.appendChild(box);
+    els.outline.appendChild(sectionEl);
   });
 }
 
-function select(i) {
-  idx = i;
-  current = chapters[i];
+function select(nextIndex) {
+  idx = nextIndex;
+  current = chapters[idx];
   identityShown = false;
   lastTickAt = null;
 
@@ -354,22 +381,22 @@ function select(i) {
   showControls();
 }
 
-function askMove(i) {
-  if (i < 0 || i >= chapters.length || i === idx) return;
+function askMove(nextIndex) {
+  if (nextIndex < 0 || nextIndex >= chapters.length || nextIndex === idx) return;
 
-  pendingMove = i;
-  els.confirmText.textContent = `${i + 1}챕터로 이동하시겠습니까?`;
+  pendingMove = nextIndex;
+  els.confirmText.textContent = `${nextIndex + 1}챕터로 이동하시겠습니까?`;
   els.confirm.classList.remove('hidden');
 }
 
 function renderTime() {
-  const s = current ? state(current) : {};
-  const d = els.video.duration || s.duration || 0;
-  const c = els.video.currentTime || 0;
-  const r = d ? Math.min(100, c / d * 100) : 0;
+  const chapterState = current ? state(current) : {};
+  const duration = els.video.duration || chapterState.duration || 0;
+  const currentTime = els.video.currentTime || 0;
+  const ratio = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
 
-  els.time.textContent = `${fmt(c)} / ${fmt(d)} · ${Math.round(r)}%`;
-  els.fill.style.width = `${r}%`;
+  els.time.textContent = `${fmt(currentTime)} / ${fmt(duration)} · ${Math.round(ratio)}%`;
+  els.fill.style.width = `${ratio}%`;
 
   els.prev.disabled = idx <= 0;
   els.next.disabled = idx >= chapters.length - 1;
@@ -379,38 +406,46 @@ function renderCourse() {
   let total = 0;
   let done = 0;
 
-  chapters.forEach(ch => {
-    const s = state(ch);
-    const r = s.duration ? Math.min(100, s.maxAllowedTime / s.duration * 100) : 0;
+  chapters.forEach(chapter => {
+    const chapterState = state(chapter);
+    const ratio = chapterState.duration
+      ? Math.min(100, (chapterState.maxAllowedTime / chapterState.duration) * 100)
+      : 0;
 
-    total += r;
+    total += ratio;
 
-    if (s.completed) done++;
+    if (chapterState.completed) {
+      done++;
+    }
   });
 
-  const r = Math.round(chapters.length ? total / chapters.length : 0);
+  const courseRatio = Math.round(chapters.length ? total / chapters.length : 0);
 
-  els.cPct.textContent = `${r}%`;
-  els.cFill.style.width = `${r}%`;
+  els.cPct.textContent = `${courseRatio}%`;
+  els.cFill.style.width = `${courseRatio}%`;
   els.chProg.textContent = `총 챕터 ${chapters.length}개 중 ${done}개 완료`;
 }
 
 function update() {
-  const s = state(current);
-  const d = els.video.duration || s.duration || 0;
+  if (!current) return;
 
-  if (d) s.duration = d;
+  const chapterState = state(current);
+  const duration = els.video.duration || chapterState.duration || 0;
 
-  const c = els.video.currentTime || 0;
-
-  if (c > s.maxAllowedTime) {
-    s.maxAllowedTime = c;
+  if (duration) {
+    chapterState.duration = duration;
   }
 
-  s.updatedAt = new Date().toISOString();
+  const currentTime = els.video.currentTime || 0;
+
+  if (currentTime > chapterState.maxAllowedTime) {
+    chapterState.maxAllowedTime = currentTime;
+  }
+
+  chapterState.updatedAt = new Date().toISOString();
 
   if (complete(current)) {
-    s.completed = true;
+    chapterState.completed = true;
 
     if (!els.overlay.classList.contains('dismissed')) {
       els.overlay.classList.remove('hidden');
@@ -437,7 +472,9 @@ function closeId() {
   els.identity.classList.add('hidden');
 
   if (wasPlaying) {
-    setTimeout(() => els.video.play().catch(() => {}), 150);
+    setTimeout(() => {
+      els.video.play().catch(() => {});
+    }, 150);
   }
 }
 
@@ -458,10 +495,10 @@ function applyPlaybackPolicy() {
   const selected = Number(els.rate.value || 1);
   const min = Number(p.minPlaybackRate || 0.75);
   const max = Number(p.maxPlaybackRate || 2);
-  const safe = Math.min(max, Math.max(min, selected));
+  const safeRate = Math.min(max, Math.max(min, selected));
 
-  els.rate.value = String(safe);
-  els.video.playbackRate = safe;
+  els.rate.value = String(safeRate);
+  els.video.playbackRate = safeRate;
 }
 
 function showControls() {
@@ -482,7 +519,9 @@ function toggleFullscreen() {
     return;
   }
 
-  els.stage.requestFullscreen?.();
+  if (els.stage.requestFullscreen) {
+    els.stage.requestFullscreen();
+  }
 }
 
 function pulseCenterHint(icon) {
@@ -495,11 +534,11 @@ function pulseCenterHint(icon) {
 }
 
 els.video.onloadedmetadata = () => {
-  const s = state(current);
-  s.duration = els.video.duration;
+  const chapterState = state(current);
+  chapterState.duration = els.video.duration;
 
-  if (s.maxAllowedTime) {
-    els.video.currentTime = Math.min(s.maxAllowedTime, s.duration);
+  if (chapterState.maxAllowedTime) {
+    els.video.currentTime = Math.min(chapterState.maxAllowedTime, chapterState.duration);
   }
 
   save();
@@ -507,15 +546,15 @@ els.video.onloadedmetadata = () => {
 };
 
 els.video.ontimeupdate = () => {
-  const s = state(current);
+  const chapterState = state(current);
   const p = pol(current);
-  const c = els.video.currentTime || 0;
+  const currentTime = els.video.currentTime || 0;
   const now = Date.now();
 
   if (!els.video.paused) {
     if (lastTickAt) {
       const diff = Math.min(2, Math.max(0, (now - lastTickAt) / 1000));
-      s.actualWatchSeconds = (s.actualWatchSeconds || 0) + diff;
+      chapterState.actualWatchSeconds = (chapterState.actualWatchSeconds || 0) + diff;
     }
 
     lastTickAt = now;
@@ -526,9 +565,9 @@ els.video.ontimeupdate = () => {
   if (
     p.identityCheckCount &&
     !identityShown &&
-    s.duration &&
-    c > s.duration * .5 &&
-    s.identityCheckCount < p.identityCheckCount
+    chapterState.duration &&
+    currentTime > chapterState.duration * 0.5 &&
+    chapterState.identityCheckCount < p.identityCheckCount
   ) {
     identityShown = true;
     openId();
@@ -545,7 +584,9 @@ els.video.onended = () => {
   if (idx < chapters.length - 1) {
     if (course.playbackPolicy?.autoAdvanceNext) {
       select(idx + 1);
-      setTimeout(() => els.video.play().catch(() => {}), 200);
+      setTimeout(() => {
+        els.video.play().catch(() => {});
+      }, 200);
     } else {
       askMove(idx + 1);
     }
@@ -572,8 +613,8 @@ els.play.onclick = () => {
   }
 };
 
-els.wrap.onclick = e => {
-  if (e.target === els.overlayClose) return;
+els.wrap.onclick = event => {
+  if (event.target === els.overlayClose) return;
 
   clearTimeout(clickTimer);
 
@@ -593,13 +634,13 @@ els.wrap.ondblclick = () => {
   toggleFullscreen();
 };
 
-els.timeline.onclick = e => {
+els.timeline.onclick = event => {
   const rect = els.timeline.getBoundingClientRect();
-  const target = (e.clientX - rect.left) / rect.width * (els.video.duration || 0);
-  const s = state(current);
+  const target = ((event.clientX - rect.left) / rect.width) * (els.video.duration || 0);
+  const chapterState = state(current);
   const p = pol(current);
 
-  if (p.preventForwardSeeking && target > s.maxAllowedTime + 1.5 && !s.completed) {
+  if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
     showControls();
     return;
   }
@@ -622,18 +663,18 @@ els.rate.onchange = () => {
   const selected = Number(els.rate.value);
   const min = Number(p.minPlaybackRate || 0.75);
   const max = Number(p.maxPlaybackRate || 2);
-  const safe = Math.min(max, Math.max(min, selected));
+  const safeRate = Math.min(max, Math.max(min, selected));
 
-  els.rate.value = String(safe);
-  els.video.playbackRate = safe;
+  els.rate.value = String(safeRate);
+  els.video.playbackRate = safeRate;
   showControls();
 };
 
 els.volume.oninput = () => {
-  const v = Number(els.volume.value);
+  const value = Number(els.volume.value);
 
-  els.video.volume = v;
-  els.video.muted = v === 0;
+  els.video.volume = value;
+  els.video.muted = value === 0;
 
   showControls();
 };
@@ -643,11 +684,13 @@ els.cc.onclick = () => {
   showControls();
 };
 
-els.full.onclick = toggleFullscreen;
+els.full.onclick = () => {
+  toggleFullscreen();
+};
 
 els.rotate.onclick = async () => {
   try {
-    if (!document.fullscreenElement) {
+    if (!document.fullscreenElement && els.stage.requestFullscreen) {
       await els.stage.requestFullscreen();
     }
 
@@ -658,8 +701,8 @@ els.rotate.onclick = async () => {
     } else {
       await screen.orientation.lock('landscape');
     }
-  } catch (e) {
-    console.log('orientation lock unavailable', e);
+  } catch (error) {
+    console.log('orientation lock unavailable', error);
   }
 };
 
@@ -671,8 +714,8 @@ els.helpClose.onclick = () => {
   els.helpOverlay.classList.add('hidden');
 };
 
-els.overlayClose.onclick = e => {
-  e.stopPropagation();
+els.overlayClose.onclick = event => {
+  event.stopPropagation();
   els.overlay.classList.add('hidden', 'dismissed');
   els.overlayClose.classList.add('hidden');
 };
@@ -722,15 +765,15 @@ els.confirmOk.onclick = () => {
 };
 
 document.addEventListener('fullscreenchange', () => {
-  const fs = document.fullscreenElement === els.stage;
+  const isFullscreen = document.fullscreenElement === els.stage;
 
   showControls();
 
-  els.full.textContent = fs ? '⤢' : '⛶';
-  els.full.setAttribute('aria-label', fs ? '전체화면 종료' : '전체화면');
+  els.full.textContent = isFullscreen ? '⤢' : '⛶';
+  els.full.setAttribute('aria-label', isFullscreen ? '전체화면 종료' : '전체화면');
 
-  els.rotate.classList.toggle('fullscreen-mobile', fs && isMobile());
-  els.rotate.classList.toggle('hidden', !(fs && isMobile()));
+  els.rotate.classList.toggle('fullscreen-mobile', isFullscreen && isMobile());
+  els.rotate.classList.toggle('hidden', !(isFullscreen && isMobile()));
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -742,11 +785,11 @@ document.addEventListener('visibilitychange', () => {
 els.stage.addEventListener('mousemove', showControls);
 els.stage.addEventListener('touchstart', showControls, { passive: true });
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', event => {
   if (!current) return;
 
-  if (e.code === 'Space') {
-    e.preventDefault();
+  if (event.code === 'Space') {
+    event.preventDefault();
 
     if (els.video.paused) {
       els.video.play();
@@ -754,4 +797,15 @@ document.addEventListener('keydown', e => {
       els.video.pause();
     }
 
-   
+    showControls();
+  }
+
+  if (event.key.toLowerCase() === 'f') {
+    toggleFullscreen();
+  }
+});
+
+init().catch(error => {
+  console.error('[OneLearn Player] init failed:', error);
+  finishLoading();
+});
