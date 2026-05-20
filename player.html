@@ -35,7 +35,7 @@
 
   <header class="site-header player-header">
     <div class="header-inner player-header-inner">
-      <a class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장으로 이동" data-tip="학습장으로 이동합니다.">
+      <a class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장으로 이동">
         <span>OneLearn</span>
         <span class="brand-dot"></span>
       </a>
@@ -44,18 +44,20 @@
 
       <div class="player-user">
         <strong id="welcomeText" data-tip="현재 로그인한 학습자와 기업 정보입니다.">확인 중입니다</strong>
-        <a id="dashboardBtn" class="outline-button" href="./dashboard.html?tenant=woongjin" data-tip="과정 목록 화면으로 돌아갑니다.">과정 목록</a>
+        <a id="dashboardBtn" class="outline-button" href="./dashboard.html?tenant=woongjin">과정 목록</a>
         <button id="chapterDrawerBtn" class="hamburger" type="button" data-tip="챕터 목록과 전체 진행률을 확인합니다.">챕터</button>
       </div>
     </div>
   </header>
 
   <main class="player-shell">
-    <section class="course-hero glass-card">
+    <section class="course-hero glass-card" data-guide="1">
+      <span class="guide-badge">①</span>
+
       <div class="course-hero-main">
         <div class="course-hero-copy">
           <h1 id="courseTitle" data-tip="과정명입니다. 현재 수강 중인 강의의 전체 제목입니다.">과정을 불러오는 중입니다</h1>
-          <div id="coursePolicyChips" class="course-policy-chips" aria-label="과정 주요 조건"></div>
+          <div id="coursePolicyChips" class="course-policy-chips" aria-label="과정 주요 조건" data-tip="마감일과 수료 조건을 배지로 보여줍니다. 마감일은 항상 가장 앞에 표시됩니다."></div>
         </div>
 
         <button id="courseDetailToggle" class="soft-button course-detail-toggle" type="button" data-tip="과정 설명, 강사, 마감일, 완료 기준을 확인합니다.">
@@ -98,7 +100,9 @@
     </section>
 
     <section class="player-main">
-      <aside id="chapterDrawer" class="chapter-panel glass-card" aria-label="챕터와 학습 현황">
+      <aside id="chapterDrawer" class="chapter-panel glass-card" aria-label="챕터와 학습 현황" data-guide="2">
+        <span class="guide-badge">②</span>
+
         <button id="chapterDrawerClose" class="drawer-close" type="button" aria-label="챕터 창 닫기">×</button>
 
         <div class="panel-head">
@@ -123,13 +127,15 @@
       </aside>
 
       <section class="video-panel glass-card">
-        <div class="video-top">
+        <div class="video-top" data-guide="3">
+          <span class="guide-badge">③</span>
           <h2 id="chapterTitle" data-tip="현재 재생 중인 챕터 제목입니다.">챕터를 선택해주세요</h2>
           <p id="chapterDesc" data-tip="현재 챕터의 학습 설명입니다.">학습할 챕터 정보를 불러오는 중입니다.</p>
         </div>
 
         <div id="playerStage" class="player-stage controls-visible">
-          <div id="videoWrap" class="video-wrap" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.">
+          <div id="videoWrap" class="video-wrap" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다." data-guide="4">
+            <span class="guide-badge">④</span>
             <video id="video" preload="metadata" playsinline></video>
 
             <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
@@ -153,15 +159,17 @@
               </div>
             </div>
 
-            <div id="timeline" class="timeline" aria-label="영상 진행률" data-tip="영상 진행률입니다. 정책에 따라 앞으로 이동이 제한될 수 있습니다.">
-              <span id="timelineFill"></span>
+            <div id="timeline" class="timeline" aria-label="영상 진행률" data-tip="진한 영역은 현재 재생 위치, 옅은 영역은 학습으로 인정되어 다시 이동 가능한 최대 위치입니다." data-guide="5">
+              <span class="guide-badge">⑤</span>
+              <span id="timelineAllowed" class="timeline-allowed"></span>
+              <span id="timelineFill" class="timeline-fill"></span>
             </div>
 
-            <div class="control-bar" aria-label="영상 컨트롤">
+            <div class="control-bar" aria-label="영상 컨트롤" data-guide="6">
+              <span class="guide-badge">⑥</span>
+
               <div class="control-left">
-                <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지" data-tip="재생 또는 일시정지합니다. 단축키: Space">
-                  ▶
-                </button>
+                <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지" data-tip="재생 또는 일시정지합니다. 단축키: Space">▶</button>
 
                 <label class="rate-select" aria-label="재생 속도" data-tip="재생 속도를 조절합니다. 과정 정책에 따라 제한될 수 있습니다.">
                   <select id="rateSelect">
@@ -173,30 +181,26 @@
                   </select>
                 </label>
 
-                <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기" data-tip="자막을 켜거나 끕니다. 단축키: C">
-                  CC
-                </button>
+                <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기" data-tip="자막을 켜거나 끕니다. 단축키: C">CC</button>
               </div>
 
               <div class="control-right">
-                <label class="volume-control" aria-label="음량 조절" data-tip="음량을 조절합니다. 0으로 내리면 음소거됩니다. 단축키: ↑ / ↓, M">
+                <button id="muteBtn" class="control-button icon-control sound-button" type="button" aria-label="음소거 또는 음소거 해제" data-tip="음소거를 켜거나 끕니다. 단축키: M">🔊</button>
+
+                <label class="volume-control" aria-label="음량 조절" data-tip="음량을 조절합니다. 0으로 내리면 음소거됩니다. 단축키: ↑ / ↓">
                   <input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1">
-                  <span id="volumeState" class="volume-state">100%</span>
                 </label>
 
-                <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환" data-tip="모바일 전체화면에서 화면 방향 전환을 시도합니다.">
-                  ↻
-                </button>
+                <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환" data-tip="모바일 전체화면에서 화면 방향 전환을 시도합니다.">↻</button>
 
-                <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면" data-tip="전체화면으로 전환합니다. 단축키: F">
-                  ⛶
-                </button>
+                <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면" data-tip="전체화면으로 전환합니다. 단축키: F">⛶</button>
               </div>
             </div>
           </div>
         </div>
 
-        <p id="playerHint" class="player-hint">
+        <p id="playerHint" class="player-hint" data-guide="7">
+          <span class="guide-badge">⑦</span>
           <span>화면 탭: 재생/일시정지 · 더블탭: 전체화면</span>
           <span class="player-hint-actions">
             <button id="usageBtn" class="help-link" type="button">사용법</button>
@@ -212,32 +216,36 @@
       <button id="usageCloseBtn" class="icon-close" type="button" aria-label="사용법 닫기">×</button>
       <div class="modal-icon">🎮</div>
       <p class="eyebrow">OneLearn 플레이어 사용법</p>
-      <h2>화면 구성과 조작 방법</h2>
+      <h2>화면 번호를 따라 확인해보세요</h2>
 
       <div class="usage-grid">
         <article>
-          <strong>1. 과정 정보</strong>
-          <p>과정명, 마감일, 수료 조건을 확인합니다. 마감일은 가장 중요한 정보로 항상 먼저 표시됩니다.</p>
+          <strong>① 과정 정보</strong>
+          <p>과정명, 마감일, 핵심 수료 조건을 확인합니다. 마감일은 항상 가장 앞에 표시됩니다.</p>
         </article>
         <article>
-          <strong>2. 챕터</strong>
-          <p>챕터 목록과 전체 진행률을 확인합니다. 현재 학습 중인 챕터는 강조 표시됩니다.</p>
+          <strong>② 챕터와 전체 진행률</strong>
+          <p>챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.</p>
         </article>
         <article>
-          <strong>3. 영상 조작</strong>
-          <p>영상 화면을 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p>
+          <strong>③ 현재 챕터 정보</strong>
+          <p>현재 학습 중인 챕터 제목과 설명을 확인합니다.</p>
         </article>
         <article>
-          <strong>4. 진행바</strong>
-          <p>현재 시청 위치를 보여줍니다. 앞으로 이동 제한 과정에서는 학습하지 않은 구간으로 이동할 수 없습니다.</p>
+          <strong>④ 영상 영역</strong>
+          <p>한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p>
         </article>
         <article>
-          <strong>5. 컨트롤</strong>
-          <p>재생, 배속, 자막, 음량, 전체화면을 조절합니다. 모바일 전체화면에서는 화면 회전 버튼이 표시될 수 있습니다.</p>
+          <strong>⑤ 진행바</strong>
+          <p>진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.</p>
         </article>
         <article>
-          <strong>6. 단축키</strong>
-          <p>Space 재생/일시정지, F 전체화면, C 자막, M 음소거, ←/→ 이동, ↑/↓ 음량 조절을 지원합니다.</p>
+          <strong>⑥ 컨트롤바</strong>
+          <p>재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.</p>
+        </article>
+        <article>
+          <strong>⑦ 사용법과 문제 해결</strong>
+          <p>사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.</p>
         </article>
       </div>
     </section>
@@ -288,7 +296,7 @@
     </section>
   </div>
 
-  <footer class="site-footer">
+  <footer class="site-footer player-footer">
     <div class="footer-inner compact">
       <a href="https://wjtb.odoo.com" target="_blank" rel="noopener">
         <img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne">
