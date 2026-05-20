@@ -10,7 +10,6 @@ const $ = id => document.getElementById(id);
 
 const els = {
   loader: $('playerLoader'),
-
   welcome: $('welcomeText'),
   dash: $('dashboardBtn'),
 
@@ -61,6 +60,11 @@ const els = {
   usage: $('usageBtn'),
   usageOverlay: $('usageOverlay'),
   usageClose: $('usageCloseBtn'),
+  usagePrev: $('usagePrevBtn'),
+  usageNext: $('usageNextBtn'),
+  usageTitle: $('usageStepTitle'),
+  usageText: $('usageStepText'),
+  usageCount: $('usageStepCount'),
 
   help: $('helpBtn'),
   helpOverlay: $('helpOverlay'),
@@ -84,7 +88,15 @@ const els = {
   confirm: $('confirmOverlay'),
   confirmText: $('confirmText'),
   confirmOk: $('confirmOk'),
-  confirmCancel: $('confirmCancel')
+  confirmCancel: $('confirmCancel'),
+
+  fsPrompt: $('fullscreenChapterPrompt'),
+  fsConfirmTitle: $('fullscreenConfirmTitle'),
+  fsConfirmText: $('fullscreenConfirmText'),
+  fsConfirmOk: $('fullscreenConfirmOk'),
+  fsConfirmCancel: $('fullscreenConfirmCancel'),
+
+  toast: $('playerToast')
 };
 
 let tenant;
@@ -103,13 +115,22 @@ let clickTimer = null;
 let tooltipTimer = null;
 let previousVolume = 1;
 let lastCompletedLogChapterId = null;
+let usageStep = 1;
+let toastTimer = null;
+
+const usageSteps = [
+  { id: 1, title: '① 과정 정보', text: '과정명, 마감일, 핵심 수료 조건을 확인합니다. 마감일은 항상 가장 앞에 표시됩니다.' },
+  { id: 2, title: '② 챕터와 전체 진행률', text: '챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.' },
+  { id: 3, title: '③ 현재 챕터 정보', text: '현재 학습 중인 챕터 제목과 설명을 확인합니다.' },
+  { id: 4, title: '④ 영상 영역', text: '한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.' },
+  { id: 5, title: '⑤ 진행바', text: '진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.' },
+  { id: 6, title: '⑥ 컨트롤바', text: '재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.' },
+  { id: 7, title: '⑦ 사용법과 문제 해결', text: '사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.' }
+];
 
 function finishLoading() {
   if (!els.loader) return;
-
-  setTimeout(() => {
-    els.loader.classList.add('done');
-  }, 450);
+  setTimeout(() => els.loader.classList.add('done'), 450);
 }
 
 function key() {
@@ -175,6 +196,43 @@ function isIOS() {
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
+function isStageFullscreen() {
+  return document.fullscreenElement === els.stage ||
+    document.webkitFullscreenElement === els.stage ||
+    document.fullscreenElement === els.video ||
+    document.webkitFullscreenElement === els.video;
+}
+
+function getPlaybackPolicy() {
+  return course?.playbackPolicy || {};
+}
+
+function canMoveChapter(targetIndex) {
+  const policy = getPlaybackPolicy();
+
+  if (targetIndex < 0 || targetIndex >= chapters.length || targetIndex === idx) {
+    return { ok: false, message: '이동할 수 없는 챕터입니다.' };
+  }
+
+  if (policy.allowChapterNavigation === false) {
+    return { ok: false, message: '관리자 설정으로 챕터 이동이 제한되어 있습니다.' };
+  }
+
+  if (targetIndex < idx && policy.allowPreviousChapter === false) {
+    return { ok: false, message: '이전 챕터 이동이 제한되어 있습니다.' };
+  }
+
+  if (targetIndex > idx && policy.allowNextChapter === false) {
+    return { ok: false, message: '다음 챕터 이동이 제한되어 있습니다.' };
+  }
+
+  if (targetIndex > idx && policy.requireCurrentChapterCompleteBeforeNext === true && !state(current).completed) {
+    return { ok: false, message: '현재 챕터 완료 후 다음 챕터로 이동할 수 있습니다.' };
+  }
+
+  return { ok: true, message: '' };
+}
+
 function pol(chapter) {
   return {
     ...(course?.completionPolicy || {}),
@@ -204,12 +262,9 @@ function complete(chapter) {
 
   if (!duration) return false;
 
-  const positionPercent = (s.maxAllowedTime / duration) * 100;
-  const actualWatchPercent = (s.actualWatchSeconds / duration) * 100;
-
   return (
-    positionPercent >= Number(p.requiredProgressPercent || p.requiredCourseProgressPercent || 95) &&
-    actualWatchPercent >= Number(p.requiredActualWatchPercent || 0) &&
+    (s.maxAllowedTime / duration) * 100 >= Number(p.requiredProgressPercent || p.requiredCourseProgressPercent || 95) &&
+    (s.actualWatchSeconds / duration) * 100 >= Number(p.requiredActualWatchPercent || 0) &&
     Number(s.identityCheckCount || 0) >= Number(p.identityCheckCount || 0)
   );
 }
@@ -222,9 +277,7 @@ async function init() {
       tenant = {
         tenantName: '웅진씽크빅',
         displayName: 'OneLearn',
-        brand: {
-          primaryColor: '#F47721'
-        }
+        brand: { primaryColor: '#F47721' }
       };
     }
 
@@ -232,22 +285,13 @@ async function init() {
 
     try {
       const learnerData = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/learners.json`);
-      learner = (learnerData.learners || []).find(x => x.userId === session.userId) || {
-        name: session.name || '학습자'
-      };
+      learner = (learnerData.learners || []).find(x => x.userId === session.userId) || { name: session.name || '학습자' };
     } catch {
-      learner = {
-        name: session.name || '학습자'
-      };
+      learner = { name: session.name || '학습자' };
     }
 
-    if (els.welcome) {
-      els.welcome.textContent = `${tenant.tenantName || tenant.displayName || 'OneLearn'} · ${learner.name} 님`;
-    }
-
-    if (els.dash) {
-      els.dash.href = `./dashboard.html?tenant=${tenantId}`;
-    }
+    els.welcome.textContent = `${tenant.tenantName || tenant.displayName || 'OneLearn'} · ${learner.name} 님`;
+    els.dash.href = `./dashboard.html?tenant=${tenantId}`;
 
     const courseList = await OneLearnStorage.fetchJson(`./data/tenants/${tenantId}/courses.json`);
     const meta = (courseList.courses || []).find(x => x.courseId === courseId);
@@ -259,12 +303,7 @@ async function init() {
     }
 
     const detail = await OneLearnStorage.fetchJson(meta.courseFile);
-
-    course = {
-      ...meta,
-      ...detail
-    };
-
+    course = { ...meta, ...detail };
     chapters = course.chapters || [];
 
     if (!chapters.length) {
@@ -280,6 +319,7 @@ async function init() {
     updateSoundIcon();
     setupTooltips();
     updateFullscreenButtons();
+    setUsageStep(1);
     logEvent('player_open');
   } catch (error) {
     console.error('[OneLearn Player] init failed:', error);
@@ -318,11 +358,7 @@ function buildChips() {
   const p = course.completionPolicy || {};
   const chips = [];
 
-  chips.push({
-    label: `⏰ ${remainText(course.dueDate)} · ${fmtDate(course.dueDate)}`,
-    cls: 'deadline'
-  });
-
+  chips.push({ label: `⏰ ${remainText(course.dueDate)} · ${fmtDate(course.dueDate)}`, cls: 'deadline' });
   if (p.preventForwardSeeking) chips.push({ label: '🔒 앞으로 이동 제한' });
   if (p.identityCheckCount) chips.push({ label: `🧑‍💻 본인확인 ${p.identityCheckCount}회` });
   if (p.requiredActualWatchPercent) chips.push({ label: `⏱ 실제 시청 ${p.requiredActualWatchPercent}%` });
@@ -334,9 +370,7 @@ function buildChips() {
 }
 
 function renderPolicyChips() {
-  const chips = buildChips();
-
-  els.policyChips.innerHTML = chips
+  els.policyChips.innerHTML = buildChips()
     .map(chip => `<span class="course-policy-chip ${chip.cls || ''}">${chip.label}</span>`)
     .join('');
 }
@@ -346,13 +380,7 @@ function renderOutline() {
 
   const sections = course.sections?.length
     ? course.sections
-    : [
-        {
-          sectionId: 'sec-001',
-          title: '기본 섹션',
-          chapterIds: chapters.map(chapter => chapter.chapterId)
-        }
-      ];
+    : [{ sectionId: 'sec-001', title: '기본 섹션', chapterIds: chapters.map(chapter => chapter.chapterId) }];
 
   sections.forEach((section, sectionIndex) => {
     const sectionEl = document.createElement('section');
@@ -388,14 +416,12 @@ function renderOutline() {
 
         button.innerHTML = `
           <strong>${String(chapterIndex + 1).padStart(2, '0')}. ${chapter.title}</strong>
-          <div class="chapter-mini-progress">
-            <i style="width:${Math.round(ratio)}%"></i>
-          </div>
+          <div class="chapter-mini-progress"><i style="width:${Math.round(ratio)}%"></i></div>
           <span class="chapter-percent">${Math.round(ratio)}%</span>
         `;
 
         button.onclick = () => {
-          select(chapterIndex);
+          requestChapterMove(chapterIndex);
           els.drawer.classList.remove('open');
         };
 
@@ -433,12 +459,39 @@ function select(nextIndex) {
   logEvent('chapter_changed', { chapterIndex: idx + 1 });
 }
 
+function requestChapterMove(nextIndex) {
+  const result = canMoveChapter(nextIndex);
+
+  if (!result.ok) {
+    showToast(result.message);
+    logEvent('chapter_move_blocked', { targetIndex: nextIndex + 1, reason: result.message });
+    return;
+  }
+
+  const policy = getPlaybackPolicy();
+
+  if (policy.confirmChapterMove === false) {
+    select(nextIndex);
+    return;
+  }
+
+  askMove(nextIndex);
+}
+
 function askMove(nextIndex) {
   if (nextIndex < 0 || nextIndex >= chapters.length || nextIndex === idx) return;
 
   pendingMove = nextIndex;
-  els.confirmText.textContent = `${nextIndex + 1}챕터로 이동하시겠습니까?`;
-  els.confirm.classList.remove('hidden');
+
+  const text = `${nextIndex + 1}챕터로 이동하시겠습니까?`;
+
+  if (isStageFullscreen()) {
+    els.fsConfirmText.textContent = text;
+    els.fsPrompt.classList.remove('hidden');
+  } else {
+    els.confirmText.textContent = text;
+    els.confirm.classList.remove('hidden');
+  }
 }
 
 function renderTime() {
@@ -450,10 +503,7 @@ function renderTime() {
 
   els.time.textContent = `${fmt(currentTime)} / ${fmt(duration)} · ${Math.round(ratio)}%`;
   els.fill.style.width = `${ratio}%`;
-
-  if (els.allowed) {
-    els.allowed.style.width = `${allowedRatio}%`;
-  }
+  els.allowed.style.width = `${allowedRatio}%`;
 
   els.prev.disabled = idx <= 0;
   els.next.disabled = idx >= chapters.length - 1;
@@ -465,15 +515,9 @@ function renderCourse() {
 
   chapters.forEach(chapter => {
     const chapterState = state(chapter);
-    const ratio = chapterState.duration
-      ? Math.min(100, (chapterState.maxAllowedTime / chapterState.duration) * 100)
-      : 0;
-
+    const ratio = chapterState.duration ? Math.min(100, (chapterState.maxAllowedTime / chapterState.duration) * 100) : 0;
     total += ratio;
-
-    if (chapterState.completed) {
-      done++;
-    }
+    if (chapterState.completed) done++;
   });
 
   const courseRatio = Math.round(chapters.length ? total / chapters.length : 0);
@@ -489,15 +533,10 @@ function update() {
   const chapterState = state(current);
   const duration = els.video.duration || chapterState.duration || 0;
 
-  if (duration) {
-    chapterState.duration = duration;
-  }
+  if (duration) chapterState.duration = duration;
 
   const currentTime = els.video.currentTime || 0;
-
-  if (currentTime > chapterState.maxAllowedTime) {
-    chapterState.maxAllowedTime = currentTime;
-  }
+  if (currentTime > chapterState.maxAllowedTime) chapterState.maxAllowedTime = currentTime;
 
   chapterState.updatedAt = new Date().toISOString();
 
@@ -522,6 +561,10 @@ function update() {
   renderOutline();
 }
 
+function getPlaybackPolicy() {
+  return course?.playbackPolicy || {};
+}
+
 function openId() {
   wasPlaying = !els.video.paused;
   els.identity.classList.remove('hidden');
@@ -532,15 +575,11 @@ function openId() {
 function closeId() {
   state(current).identityCheckCount++;
   save();
-
   els.identity.classList.add('hidden');
-
   logEvent('identity_check_pass');
 
   if (wasPlaying) {
-    setTimeout(() => {
-      els.video.play().catch(() => {});
-    }, 150);
+    setTimeout(() => els.video.play().catch(() => {}), 150);
   }
 }
 
@@ -569,7 +608,6 @@ function applyPlaybackPolicy() {
 
 function showControls() {
   els.stage.classList.add('controls-visible');
-
   clearTimeout(controlsTimer);
 
   if (isStageFullscreen() && !els.video.paused) {
@@ -579,20 +617,10 @@ function showControls() {
   }
 }
 
-function isStageFullscreen() {
-  return document.fullscreenElement === els.stage ||
-    document.webkitFullscreenElement === els.stage ||
-    document.fullscreenElement === els.video ||
-    document.webkitFullscreenElement === els.video;
-}
-
 function toggleFullscreen() {
   if (document.fullscreenElement || document.webkitFullscreenElement) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     return;
   }
 
@@ -618,22 +646,14 @@ function updateFullscreenButtons() {
   els.full.textContent = fullscreen ? '⛌' : '⛶';
   els.full.setAttribute('aria-label', fullscreen ? '전체화면 종료' : '전체화면');
 
-  if (shouldShowRotate) {
-    els.rotate.classList.add('fullscreen-mobile');
-    els.rotate.classList.remove('hidden');
-  } else {
-    els.rotate.classList.remove('fullscreen-mobile');
-    els.rotate.classList.add('hidden');
-  }
+  els.rotate.classList.toggle('fullscreen-mobile', shouldShowRotate);
+  els.rotate.classList.toggle('hidden', !shouldShowRotate);
 }
 
 function pulseCenterHint(icon) {
   els.hint.textContent = icon;
   els.hint.classList.add('show');
-
-  setTimeout(() => {
-    els.hint.classList.remove('show');
-  }, 420);
+  setTimeout(() => els.hint.classList.remove('show'), 420);
 }
 
 function updateSoundIcon() {
@@ -674,6 +694,7 @@ function seekBy(seconds) {
   const p = pol(current);
 
   if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
+    showToast('아직 학습하지 않은 구간으로 이동할 수 없습니다.');
     showControls();
     logEvent('seek_blocked', { target });
     return;
@@ -682,6 +703,17 @@ function seekBy(seconds) {
   els.video.currentTime = target;
   showControls();
   logEvent('seek_attempt', { target });
+}
+
+function showToast(message) {
+  clearTimeout(toastTimer);
+
+  els.toast.textContent = message;
+  els.toast.classList.remove('hidden');
+
+  toastTimer = setTimeout(() => {
+    els.toast.classList.add('hidden');
+  }, 1800);
 }
 
 function setupTooltips() {
@@ -724,10 +756,20 @@ function showTooltip(node) {
 
 function hideTooltip() {
   clearTimeout(tooltipTimer);
+  els.tooltip?.classList.add('hidden');
+}
 
-  if (els.tooltip) {
-    els.tooltip.classList.add('hidden');
-  }
+function setUsageStep(step) {
+  usageStep = Math.max(1, Math.min(usageSteps.length, step));
+  const data = usageSteps[usageStep - 1];
+
+  els.usageTitle.textContent = data.title;
+  els.usageText.textContent = data.text;
+  els.usageCount.textContent = `${usageStep} / ${usageSteps.length}`;
+
+  document.querySelectorAll('[data-guide]').forEach(node => {
+    node.classList.toggle('usage-active', Number(node.dataset.guide) === usageStep);
+  });
 }
 
 els.video.onloadedmetadata = () => {
@@ -753,7 +795,6 @@ els.video.ontimeupdate = () => {
       const diff = Math.min(2, Math.max(0, (now - lastTickAt) / 1000));
       chapterState.actualWatchSeconds = (chapterState.actualWatchSeconds || 0) + diff;
     }
-
     lastTickAt = now;
   } else {
     lastTickAt = null;
@@ -782,11 +823,9 @@ els.video.onended = () => {
   if (idx < chapters.length - 1) {
     if (course.playbackPolicy?.autoAdvanceNext) {
       select(idx + 1);
-      setTimeout(() => {
-        els.video.play().catch(() => {});
-      }, 200);
+      setTimeout(() => els.video.play().catch(() => {}), 200);
     } else {
-      askMove(idx + 1);
+      requestChapterMove(idx + 1);
     }
   }
 };
@@ -841,6 +880,7 @@ els.timeline.onclick = event => {
   const p = pol(current);
 
   if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
+    showToast('아직 학습하지 않은 구간으로 이동할 수 없습니다.');
     showControls();
     logEvent('seek_blocked', { target });
     return;
@@ -880,18 +920,14 @@ els.volume.oninput = () => {
   els.video.volume = value;
   els.video.muted = value === 0;
 
-  if (value > 0) {
-    previousVolume = value;
-  }
+  if (value > 0) previousVolume = value;
 
   updateSoundIcon();
   showControls();
   logEvent('volume_changed', { volume: value });
 };
 
-els.mute.onclick = () => {
-  toggleMute();
-};
+els.mute.onclick = toggleMute;
 
 els.cc.onclick = () => {
   els.cc.classList.toggle('cc-on');
@@ -899,18 +935,13 @@ els.cc.onclick = () => {
   logEvent('caption_toggled', { on: els.cc.classList.contains('cc-on') });
 };
 
-els.full.onclick = () => {
-  toggleFullscreen();
-};
+els.full.onclick = toggleFullscreen;
 
 els.rotate.onclick = async () => {
   try {
     if (!isStageFullscreen()) {
-      if (els.stage.requestFullscreen) {
-        await els.stage.requestFullscreen();
-      } else if (els.stage.webkitRequestFullscreen) {
-        await els.stage.webkitRequestFullscreen();
-      }
+      if (els.stage.requestFullscreen) await els.stage.requestFullscreen();
+      else if (els.stage.webkitRequestFullscreen) await els.stage.webkitRequestFullscreen();
     }
 
     const type = screen.orientation?.type || '';
@@ -938,6 +969,7 @@ els.rotate.onclick = async () => {
 els.usage.onclick = () => {
   document.body.classList.add('usage-on');
   els.usageOverlay.classList.remove('hidden');
+  setUsageStep(1);
 };
 
 els.usageClose.onclick = () => {
@@ -945,13 +977,11 @@ els.usageClose.onclick = () => {
   els.usageOverlay.classList.add('hidden');
 };
 
-els.help.onclick = () => {
-  els.helpOverlay.classList.remove('hidden');
-};
+els.usagePrev.onclick = () => setUsageStep(usageStep - 1);
+els.usageNext.onclick = () => setUsageStep(usageStep + 1);
 
-els.helpClose.onclick = () => {
-  els.helpOverlay.classList.add('hidden');
-};
+els.help.onclick = () => els.helpOverlay.classList.remove('hidden');
+els.helpClose.onclick = () => els.helpOverlay.classList.add('hidden');
 
 els.overlayClose.onclick = event => {
   event.stopPropagation();
@@ -961,7 +991,6 @@ els.overlayClose.onclick = event => {
 
 els.toggle.onclick = () => {
   const open = els.detail.classList.toggle('hidden') === false;
-
   els.toggle.classList.toggle('open', open);
   els.toggleText.textContent = open ? '접기' : '자세히';
 };
@@ -975,21 +1004,11 @@ els.submit.onclick = () => {
   closeId();
 };
 
-els.drawerBtn.onclick = () => {
-  els.drawer.classList.add('open');
-};
+els.drawerBtn.onclick = () => els.drawer.classList.add('open');
+els.drawerClose.onclick = () => els.drawer.classList.remove('open');
 
-els.drawerClose.onclick = () => {
-  els.drawer.classList.remove('open');
-};
-
-els.prev.onclick = () => {
-  askMove(idx - 1);
-};
-
-els.next.onclick = () => {
-  askMove(idx + 1);
-};
+els.prev.onclick = () => requestChapterMove(idx - 1);
+els.next.onclick = () => requestChapterMove(idx + 1);
 
 els.confirmCancel.onclick = () => {
   els.confirm.classList.add('hidden');
@@ -997,6 +1016,20 @@ els.confirmCancel.onclick = () => {
 
 els.confirmOk.onclick = () => {
   els.confirm.classList.add('hidden');
+
+  if (pendingMove !== null) {
+    select(pendingMove);
+  }
+
+  pendingMove = null;
+};
+
+els.fsConfirmCancel.onclick = () => {
+  els.fsPrompt.classList.add('hidden');
+};
+
+els.fsConfirmOk.onclick = () => {
+  els.fsPrompt.classList.add('hidden');
 
   if (pendingMove !== null) {
     select(pendingMove);
@@ -1032,9 +1065,7 @@ screen.orientation?.addEventListener?.('change', () => {
 });
 
 window.addEventListener('resize', () => {
-  setTimeout(() => {
-    updateFullscreenButtons();
-  }, 150);
+  setTimeout(updateFullscreenButtons, 150);
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -1067,17 +1098,9 @@ document.addEventListener('keydown', event => {
     showControls();
   }
 
-  if (event.key.toLowerCase() === 'f') {
-    toggleFullscreen();
-  }
-
-  if (event.key.toLowerCase() === 'c') {
-    els.cc.click();
-  }
-
-  if (event.key.toLowerCase() === 'm') {
-    toggleMute();
-  }
+  if (event.key.toLowerCase() === 'f') toggleFullscreen();
+  if (event.key.toLowerCase() === 'c') els.cc.click();
+  if (event.key.toLowerCase() === 'm') toggleMute();
 
   if (event.key === 'ArrowRight') {
     event.preventDefault();
@@ -1091,15 +1114,13 @@ document.addEventListener('keydown', event => {
 
   if (event.key === 'ArrowUp') {
     event.preventDefault();
-    const nextVolume = Math.min(1, Number(els.volume.value) + 0.05);
-    els.volume.value = String(nextVolume);
+    els.volume.value = String(Math.min(1, Number(els.volume.value) + 0.05));
     els.volume.dispatchEvent(new Event('input'));
   }
 
   if (event.key === 'ArrowDown') {
     event.preventDefault();
-    const nextVolume = Math.max(0, Number(els.volume.value) - 0.05);
-    els.volume.value = String(nextVolume);
+    els.volume.value = String(Math.max(0, Number(els.volume.value) - 0.05));
     els.volume.dispatchEvent(new Event('input'));
   }
 
@@ -1108,6 +1129,7 @@ document.addEventListener('keydown', event => {
     els.usageOverlay.classList.add('hidden');
     els.helpOverlay.classList.add('hidden');
     els.confirm.classList.add('hidden');
+    els.fsPrompt.classList.add('hidden');
   }
 });
 
