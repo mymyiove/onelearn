@@ -21,6 +21,7 @@ const els = {
   title: $('courseTitle'),
   desc: $('courseDesc'),
   toggle: $('courseDetailToggle'),
+  toggleText: $('courseDetailToggleText'),
   detail: $('courseDetailPanel'),
 
   thumb: $('courseThumbnailBox'),
@@ -51,13 +52,20 @@ const els = {
   play: $('playBtn'),
   rate: $('rateSelect'),
   volume: $('volumeInput'),
+  volumeState: $('volumeState'),
   cc: $('ccBtn'),
   full: $('fullscreenBtn'),
   rotate: $('rotateBtn'),
 
+  usage: $('usageBtn'),
+  usageOverlay: $('usageOverlay'),
+  usageClose: $('usageCloseBtn'),
+
   help: $('helpBtn'),
   helpOverlay: $('helpOverlay'),
   helpClose: $('helpCloseBtn'),
+
+  tooltip: $('onelearnTooltip'),
 
   identity: $('identityModal'),
   code: $('identityCode'),
@@ -91,6 +99,8 @@ let pendingMove = null;
 let lastTickAt = null;
 let controlsTimer = null;
 let clickTimer = null;
+let tooltipTimer = null;
+let previousVolume = 1;
 
 function finishLoading() {
   if (!els.loader) return;
@@ -235,6 +245,8 @@ async function init() {
 
     renderBase();
     select(0);
+    updateVolumeState();
+    setupTooltips();
   } catch (error) {
     console.error('[OneLearn Player] init failed:', error);
     alert('과정 정보를 불러오지 못했습니다.');
@@ -313,7 +325,7 @@ function renderOutline() {
     sectionEl.className = 'outline-section';
 
     sectionEl.innerHTML = `
-      <button class="outline-toggle" type="button">
+      <button class="outline-toggle" type="button" data-tip="섹션을 접거나 펼칩니다.">
         <span>섹션${sectionIndex + 1}. ${section.title}</span>
         <span class="outline-chevron">▾</span>
       </button>
@@ -322,6 +334,7 @@ function renderOutline() {
 
     sectionEl.querySelector('.outline-toggle').onclick = () => {
       sectionEl.classList.toggle('collapsed');
+      setupTooltips();
     };
 
     const body = sectionEl.querySelector('.outline-body');
@@ -337,6 +350,7 @@ function renderOutline() {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `chapter-button ${chapterIndex === idx ? 'active' : ''}`;
+        button.dataset.tip = '챕터를 선택해 학습을 시작하거나 이어봅니다.';
 
         button.innerHTML = `
           <strong>${String(chapterIndex + 1).padStart(2, '0')}. ${chapter.title}</strong>
@@ -356,6 +370,8 @@ function renderOutline() {
 
     els.outline.appendChild(sectionEl);
   });
+
+  setupTooltips();
 }
 
 function select(nextIndex) {
@@ -533,6 +549,89 @@ function pulseCenterHint(icon) {
   }, 420);
 }
 
+function updateVolumeState() {
+  const value = Number(els.volume.value || 0);
+
+  if (els.volumeState) {
+    els.volumeState.textContent = value === 0 || els.video.muted ? '음소거' : `${Math.round(value * 100)}%`;
+  }
+}
+
+function toggleMute() {
+  if (els.video.muted || Number(els.volume.value) === 0) {
+    els.video.muted = false;
+    els.volume.value = previousVolume || 1;
+  } else {
+    previousVolume = Number(els.volume.value) || 1;
+    els.video.muted = true;
+    els.volume.value = 0;
+  }
+
+  updateVolumeState();
+  showControls();
+}
+
+function seekBy(seconds) {
+  if (!current) return;
+
+  const target = Math.max(0, Math.min((els.video.duration || 0), (els.video.currentTime || 0) + seconds));
+  const chapterState = state(current);
+  const p = pol(current);
+
+  if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
+    showControls();
+    return;
+  }
+
+  els.video.currentTime = target;
+  showControls();
+}
+
+function setupTooltips() {
+  if (!els.tooltip || isMobile()) return;
+
+  document.querySelectorAll('[data-tip]').forEach(node => {
+    if (node.dataset.tooltipReady === 'true') return;
+
+    node.dataset.tooltipReady = 'true';
+
+    node.addEventListener('mouseenter', () => {
+      clearTimeout(tooltipTimer);
+      tooltipTimer = setTimeout(() => showTooltip(node), 900);
+    });
+
+    node.addEventListener('mouseleave', hideTooltip);
+    node.addEventListener('focus', () => showTooltip(node));
+    node.addEventListener('blur', hideTooltip);
+  });
+}
+
+function showTooltip(node) {
+  if (!els.tooltip || !node.dataset.tip) return;
+
+  const rect = node.getBoundingClientRect();
+
+  els.tooltip.textContent = node.dataset.tip;
+  els.tooltip.classList.remove('hidden');
+
+  const tooltipRect = els.tooltip.getBoundingClientRect();
+  const left = Math.min(
+    window.innerWidth - tooltipRect.width - 12,
+    Math.max(12, rect.left + rect.width / 2 - tooltipRect.width / 2)
+  );
+  const top = Math.max(12, rect.top - tooltipRect.height - 10);
+
+  els.tooltip.style.left = `${left}px`;
+  els.tooltip.style.top = `${top}px`;
+}
+
+function hideTooltip() {
+  clearTimeout(tooltipTimer);
+  if (els.tooltip) {
+    els.tooltip.classList.add('hidden');
+  }
+}
+
 els.video.onloadedmetadata = () => {
   const chapterState = state(current);
   chapterState.duration = els.video.duration;
@@ -676,6 +775,11 @@ els.volume.oninput = () => {
   els.video.volume = value;
   els.video.muted = value === 0;
 
+  if (value > 0) {
+    previousVolume = value;
+  }
+
+  updateVolumeState();
   showControls();
 };
 
@@ -706,6 +810,14 @@ els.rotate.onclick = async () => {
   }
 };
 
+els.usage.onclick = () => {
+  els.usageOverlay.classList.remove('hidden');
+};
+
+els.usageClose.onclick = () => {
+  els.usageOverlay.classList.add('hidden');
+};
+
 els.help.onclick = () => {
   els.helpOverlay.classList.remove('hidden');
 };
@@ -722,7 +834,9 @@ els.overlayClose.onclick = event => {
 
 els.toggle.onclick = () => {
   const open = els.detail.classList.toggle('hidden') === false;
-  els.toggle.textContent = open ? '접기 ∧' : '자세히 >';
+
+  els.toggle.classList.toggle('open', open);
+  els.toggleText.textContent = open ? '접기' : '자세히';
 };
 
 els.submit.onclick = () => {
@@ -788,6 +902,11 @@ els.stage.addEventListener('touchstart', showControls, { passive: true });
 document.addEventListener('keydown', event => {
   if (!current) return;
 
+  const tagName = document.activeElement?.tagName?.toLowerCase();
+  const isTyping = tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+
+  if (isTyping && event.code !== 'Escape') return;
+
   if (event.code === 'Space') {
     event.preventDefault();
 
@@ -802,6 +921,44 @@ document.addEventListener('keydown', event => {
 
   if (event.key.toLowerCase() === 'f') {
     toggleFullscreen();
+  }
+
+  if (event.key.toLowerCase() === 'c') {
+    els.cc.click();
+  }
+
+  if (event.key.toLowerCase() === 'm') {
+    toggleMute();
+  }
+
+  if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    seekBy(5);
+  }
+
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    seekBy(-5);
+  }
+
+  if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    const nextVolume = Math.min(1, Number(els.volume.value) + 0.05);
+    els.volume.value = String(nextVolume);
+    els.volume.dispatchEvent(new Event('input'));
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    const nextVolume = Math.max(0, Number(els.volume.value) - 0.05);
+    els.volume.value = String(nextVolume);
+    els.volume.dispatchEvent(new Event('input'));
+  }
+
+  if (event.code === 'Escape') {
+    els.usageOverlay.classList.add('hidden');
+    els.helpOverlay.classList.add('hidden');
+    els.confirm.classList.add('hidden');
   }
 });
 
