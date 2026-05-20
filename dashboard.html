@@ -1,147 +1,25 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>OneLearn 학습장</title>
-  <link rel="icon" href="./src/img/Favicon.png">
-  <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-  <link rel="stylesheet" href="./src/css/common.css">
-  <link rel="stylesheet" href="./src/css/dashboard.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OneLearn 학습장</title>
+<link rel="icon" href="./src/img/Favicon.png">
+<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="./src/css/common.css"><link rel="stylesheet" href="./src/css/dashboard.css">
 </head>
 <body class="onelearn-dashboard-page">
-  <div class="ambient-bg" aria-hidden="true"><span>🎓</span><span>🚀</span><span>🌱</span><span>✨</span></div>
-
-  <div id="pageLoader" class="page-loader" aria-live="polite">
-    <div class="loader-card">
-      <div class="loader-orbit" aria-hidden="true"><span>🚀</span><i></i></div>
-      <h1>학습장을 준비하고 있어요</h1>
-      <p>학습 현황을 불러오고 있습니다.</p>
-    </div>
-  </div>
-
-  <header class="site-header dashboard-header">
-    <div class="header-inner dashboard-header-inner">
-      <a id="brandHomeLink" class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장 홈">
-        <span>OneLearn</span><span class="brand-dot"></span>
-      </a>
-      <div class="header-spacer"></div>
-      <div class="header-user">
-        <strong id="welcomeText">확인 중입니다</strong>
-        <button id="quickSearchBtn" class="outline-button desktop-only" type="button">빠른 검색</button>
-        <button id="logoutBtn" class="outline-button" type="button">로그아웃</button>
-        <button id="mobileMenuBtn" class="hamburger" type="button" aria-label="모바일 메뉴 열기">=</button>
-      </div>
-      <nav id="mobileNav" class="mobile-nav" aria-label="모바일 메뉴">
-        <strong id="mobileWelcome">확인 중입니다</strong>
-        <a href="#statusSection">학습 현황</a>
-        <a href="#courseGrid">강의 목록</a>
-        <a href="#noticeArea">공지사항</a>
-        <button id="mobileQuickSearchBtn" type="button">빠른 검색</button>
-      </nav>
-    </div>
-  </header>
-
-  <main class="page-shell">
-    <section id="statusSection" class="status-section glass-card">
-      <div class="section-head dashboard-hero-head">
-        <div>
-          <div class="hero-badge">✨ <strong id="quoteRotator">배움은 우연히 얻어지는 것이 아니라 열정과 근면으로 얻어진다. - 애비게일 애덤스</strong></div>
-          <h1 id="dashboardTitle">오늘도 조금 더 성장해볼까요?</h1>
-        </div>
-        <div class="hero-pulse" aria-label="전체 학습 진행률">
-          <div id="heroProgressRing" class="hero-ring" style="--p:0deg"><strong id="heroProgressText">0%</strong></div>
-          <span>전체 평균</span>
-        </div>
-      </div>
-
-      <section id="summaryGrid" class="summary-grid" aria-label="학습 요약">
-        <article class="summary-card clickable active" data-filter="all"><span>📚</span><b>추천 과정</b><strong id="totalCount">0</strong></article>
-        <article class="summary-card clickable" data-filter="progress"><span>🚀</span><b>진행 중</b><strong id="inProgressCount">0</strong></article>
-        <article class="summary-card clickable success" data-filter="completed"><span>🏅</span><b>수료 완료</b><strong id="completedCount">0</strong></article>
-        <article class="summary-card clickable warning" data-filter="urgent"><span>🔥</span><b>마감 임박</b><strong id="urgentCount">0</strong></article>
-      </section>
-    </section>
-
-    <section class="hero-section">
-      <div class="hero-copy glass-card">
-        <div class="hero-copy-top">
-          <h2>추천 과정을 확인하거나<br>학습을 이어서 진행해보세요!</h2>
-        </div>
-
-        <div id="recentCard" class="lecture-strip hidden">
-          <a id="recentTitleLink" class="lecture-title" href="#"><span class="lecture-thumb">🎬</span><span><small>최근 학습 강의</small><strong id="recentTitle">-</strong></span></a>
-          <div id="recentBadges" class="lecture-badges desktop-only"></div>
-          <a id="recentLink" class="primary-link big-cta" href="#">▶ 바로가기</a>
-        </div>
-
-        <div id="recommendCard" class="lecture-strip">
-          <a id="recommendTitleLink" class="lecture-title" href="#"><span class="lecture-thumb">💡</span><span><small>추천 강의</small><strong id="recommendTitle">-</strong></span></a>
-          <div id="recommendBadges" class="lecture-badges desktop-only"></div>
-          <a id="recommendLink" class="primary-link big-cta" href="#">▶ 바로가기</a>
-        </div>
-
-        <div id="deadlineStrip" class="deadline-strip hidden"></div>
-      </div>
-
-      <aside id="noticeArea" class="hero-panel notice-panel glass-card">
-        <div class="notice-head"><span>📢</span><strong id="noticeTitle">공지</strong></div>
-        <div id="noticeCard" class="notice-card" tabindex="0" role="button" aria-label="공지 자세히 보기"><p id="noticePreview">-</p><time id="noticeDate">-</time></div>
-        <div class="notice-controls">
-          <button id="noticePrev" type="button" aria-label="이전 공지">‹</button><span id="noticeIndex">1 / 3</span><button id="noticeNext" type="button" aria-label="다음 공지">›</button><button id="noticePause" class="notice-pause" type="button" aria-label="공지 일시정지">Ⅱ</button>
-        </div>
-      </aside>
-    </section>
-
-    <section class="insight-section glass-card">
-      <div class="insight-main">
-        <h2 id="insightTitle">아직 분석 중입니다</h2>
-        <p id="insightText">과정 데이터를 불러오면 우선순위와 추천 행동을 안내합니다.</p>
-      </div>
-      <div class="insight-actions">
-        <button id="resumeBestBtn" class="primary-button" type="button">추천 과정 시작</button>
-        <button id="resetFilterBtn" class="ghost-button" type="button">필터 초기화</button>
-      </div>
-    </section>
-
-    <section class="toolbar-section" aria-label="과정 필터와 검색">
-      <div id="filterTabs" class="filter-tabs">
-        <button class="active" data-filter="all" type="button">전체</button>
-        <button data-filter="required" type="button">필수</button>
-        <button data-filter="progress" type="button">진행 중</button>
-        <button data-filter="incomplete" type="button">미수료</button>
-        <button data-filter="completed" type="button">수료</button>
-        <button data-filter="urgent" type="button">마감</button>
-      </div>
-      <div class="search-box">
-        <input id="searchInput" type="search" placeholder="키워드나 과정명을 자유롭게 검색해보세요" autocomplete="off">
-        <button id="searchBtn" type="button">검색</button>
-      </div>
-    </section>
-
-    <div class="result-meta"><span id="resultCountText">0개 과정</span><div class="view-toggle" aria-label="보기 방식"><button id="gridViewBtn" class="active" type="button">카드</button><button id="compactViewBtn" type="button">압축</button></div></div>
-    <section id="courseGrid" class="course-grid" aria-live="polite"></section>
-    <nav id="pagination" class="pagination hidden" aria-label="페이지 이동"></nav>
-    <section id="emptyState" class="empty-state hidden">🧐<h2>표시할 과정이 없습니다</h2><p>검색어를 줄이거나 필터를 전체로 바꿔보세요.</p></section>
-  </main>
-
-  <footer class="site-footer dashboard-footer">
-    <div class="footer-inner compact dashboard-footer-inner">
-      <a href="https://wjtb.odoo.com" target="_blank" rel="noopener"><img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne"></a>
-      <p class="footer-desc">OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>© 2026 Woongjin Thinkbig, Hugh.</p>
-    </div>
-  </footer>
-
-  <div id="noticeOverlay" class="notice-overlay hidden"><section class="notice-modal"><button id="noticeCloseBtn" class="icon-close" type="button" aria-label="공지 닫기">×</button><div class="modal-icon">📢</div><p class="eyebrow">공지사항</p><h2 id="noticeModalTitle">공지</h2><time id="noticeModalDate">-</time><p id="noticeModalBody">-</p></section></div>
-
-  <div id="consentOverlay" class="consent-overlay hidden"><section class="consent-modal"><div class="consent-modal-head"><div class="consent-icon">📄</div><div><p class="eyebrow">최초 이용 전 확인</p><h2>약관과 개인정보 처리 안내</h2></div></div><div class="agree-all-box"><label><input id="agreeAllCheck" type="checkbox"> <strong>필수 항목 전체 확인</strong></label></div><div class="consent-body"><article><h3>서비스 이용약관</h3><p>과정 제공, 학습 이력 확인, 수료 증빙 리포트 제공을 위한 학습 플랫폼입니다.</p><label><input id="termsCheck" type="checkbox"> 확인했습니다.</label></article><article><h3>개인정보 수집·이용 안내</h3><p>수료 증빙 목적으로 이름, 이메일, 사번, 진행률, 시청 기록을 처리합니다.</p><label><input id="privacyCheck" type="checkbox"> 확인했습니다.</label></article><article><h3>학습 이력 처리 안내</h3><p>재생, 일시정지, 진행률, 본인확인, 챕터 완료 기록이 저장됩니다.</p><label><input id="learningLogCheck" type="checkbox"> 확인했습니다.</label></article></div><div class="consent-fixed-actions"><button id="acceptConsentBtn" class="primary-button" type="button">동의하고 학습 시작</button><p id="consentMessage" class="form-message"></p></div></section></div>
-
-  <div id="quickSearchOverlay" class="quick-search-overlay hidden"><section class="quick-search-modal"><button id="quickSearchClose" class="icon-close" type="button" aria-label="빠른 검색 닫기">×</button><p class="eyebrow">빠른 검색</p><input id="quickSearchInput" type="search" placeholder="과정명, 카테고리, 설명 검색"><div id="quickSearchResults" class="quick-search-results"></div></section></div>
-
-  <div id="dashboardToast" class="dashboard-toast hidden" role="status"></div>
-
-  <script src="./src/js/config.js"></script>
-  <script src="./src/js/storage.js"></script>
-  <script src="./src/js/dashboard.js"></script>
-</body>
-</html>
+<div class="ambient-bg" aria-hidden="true"><span>🎓</span><span>🚀</span><span>🌱</span><span>✨</span></div>
+<div id="pageLoader" class="page-loader"><div class="loader-card"><div class="loader-orbit"><span>🚀</span><i></i></div><h1>학습장을 준비하고 있어요</h1><p>학습 현황을 불러오고 있습니다.</p></div></div>
+<header class="site-header dashboard-header"><div class="header-inner dashboard-header-inner"><a id="brandHomeLink" class="brand-text" href="./dashboard.html?tenant=woongjin"><span>OneLearn</span><span class="brand-dot"></span></a><div class="header-spacer"></div><div class="header-user"><strong id="welcomeText">확인 중입니다</strong><button id="quickSearchBtn" class="outline-button desktop-only" type="button">빠른 검색</button><button id="logoutBtn" class="outline-button" type="button">로그아웃</button><button id="mobileMenuBtn" class="hamburger" type="button">=</button></div><nav id="mobileNav" class="mobile-nav"><strong id="mobileWelcome">확인 중입니다</strong><a href="#statusSection">학습 현황</a><a href="#courseGrid">강의 목록</a><a href="#noticeArea">공지사항</a><button id="mobileQuickSearchBtn" type="button">빠른 검색</button></nav></div></header>
+<main class="page-shell">
+<section id="statusSection" class="status-section glass-card"><div class="dashboard-hero-head"><div><div class="hero-badge">✨ <strong id="quoteRotator">배움은 우연히 얻어지는 것이 아니라 열정과 근면으로 얻어진다. - 애비게일 애덤스</strong></div><h1 id="dashboardTitle">오늘도 조금 더 성장해볼까요?</h1></div><div class="hero-pulse"><div id="heroProgressRing" class="hero-ring" style="--p:0deg"><strong id="heroProgressText">0%</strong></div><span>전체 평균</span></div></div><section id="summaryGrid" class="summary-grid"><article class="summary-card clickable active" data-filter="all"><span>📚</span><b>추천 과정</b><strong id="totalCount">0</strong></article><article class="summary-card clickable" data-filter="progress"><span>🚀</span><b>진행 중</b><strong id="inProgressCount">0</strong></article><article class="summary-card clickable success" data-filter="completed"><span>🏅</span><b>수료 완료</b><strong id="completedCount">0</strong></article><article class="summary-card clickable warning" data-filter="urgent"><span>🔥</span><b>마감 임박</b><strong id="urgentCount">0</strong></article></section></section>
+<section class="hero-section"><div class="hero-copy glass-card"><h2>추천 과정을 확인하거나<br>학습을 이어서 진행해보세요!</h2><div id="recentCard" class="lecture-strip hidden"><a id="recentTitleLink" class="lecture-title" href="#"><span class="lecture-thumb">🎬</span><span><small>최근 학습 강의</small><strong id="recentTitle">-</strong></span></a><div id="recentBadges" class="lecture-badges desktop-only"></div><a id="recentLink" class="primary-link big-cta" href="#">▶ 바로가기</a></div><div id="recommendCard" class="lecture-strip"><a id="recommendTitleLink" class="lecture-title" href="#"><span class="lecture-thumb">💡</span><span><small>추천 강의</small><strong id="recommendTitle">-</strong></span></a><div id="recommendBadges" class="lecture-badges desktop-only"></div><a id="recommendLink" class="primary-link big-cta" href="#">▶ 바로가기</a></div><div id="deadlineStrip" class="deadline-strip hidden"></div></div><aside id="noticeArea" class="hero-panel notice-panel glass-card"><div class="notice-head"><span>📢</span><strong id="noticeTitle">공지</strong></div><div id="noticeCard" class="notice-card" tabindex="0" role="button"><p id="noticePreview">-</p><time id="noticeDate">-</time></div><div class="notice-controls"><button id="noticePrev" type="button">‹</button><span id="noticeIndex">1 / 3</span><button id="noticeNext" type="button">›</button><button id="noticePause" class="notice-pause" type="button">Ⅱ</button></div></aside></section>
+<section class="toolbar-section"><div id="filterTabs" class="filter-tabs"><button class="active" data-filter="all" type="button">전체</button><button data-filter="required" type="button">필수</button><button data-filter="optional" type="button">선택</button><button data-filter="progress" type="button">진행 중</button><button data-filter="incomplete" type="button">미수료</button><button data-filter="completed" type="button">수료</button><button data-filter="urgent" type="button">마감임박</button><button data-filter="expired" type="button">마감</button></div><div class="search-box"><input id="searchInput" type="search" placeholder="키워드나 과정명을 자유롭게 검색해보세요"><button id="searchBtn" type="button">검색</button><button id="resetFilterBtn" class="ghost-button" type="button">초기화</button></div></section>
+<div class="result-meta"><span id="resultCountText">0개 과정</span><div class="view-toggle"><button id="gridViewBtn" class="active" type="button">카드</button><button id="compactViewBtn" type="button">압축</button></div></div><section id="courseGrid" class="course-grid"></section><nav id="pagination" class="pagination hidden"></nav><section id="emptyState" class="empty-state hidden">🧐<h2>표시할 과정이 없습니다</h2><p>검색어를 줄이거나 필터를 전체로 바꿔보세요.</p></section>
+</main>
+<footer class="site-footer dashboard-footer"><div class="footer-inner compact dashboard-footer-inner"><a href="https://wjtb.odoo.com" target="_blank" rel="noopener"><img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne"></a><p class="footer-desc">OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>© 2026 Woongjin Thinkbig, Hugh.</p></div></footer>
+<div id="noticeOverlay" class="notice-overlay hidden"><section class="notice-modal"><button id="noticeCloseBtn" class="icon-close" type="button">×</button><div class="modal-icon">📢</div><p class="eyebrow">공지사항</p><h2 id="noticeModalTitle">공지</h2><time id="noticeModalDate">-</time><p id="noticeModalBody">-</p></section></div>
+<div id="consentOverlay" class="consent-overlay hidden"><section class="consent-modal"><div class="consent-modal-head"><div class="consent-icon">📄</div><div><p class="eyebrow">최초 이용 전 확인</p><h2>약관과 개인정보 처리 안내</h2></div></div><div class="agree-all-box"><label><input id="agreeAllCheck" type="checkbox"> <strong>필수 항목 전체 확인</strong></label></div><div class="consent-body"><article><h3>서비스 이용약관</h3><p>과정 제공, 학습 이력 확인, 수료 증빙 리포트 제공을 위한 학습 플랫폼입니다.</p><label><input id="termsCheck" type="checkbox"> 확인했습니다.</label></article><article><h3>개인정보 수집·이용 안내</h3><p>수료 증빙 목적으로 이름, 이메일, 사번, 진행률, 시청 기록을 처리합니다.</p><label><input id="privacyCheck" type="checkbox"> 확인했습니다.</label></article><article><h3>학습 이력 처리 안내</h3><p>재생, 일시정지, 진행률, 본인확인, 챕터 완료 기록이 저장됩니다.</p><label><input id="learningLogCheck" type="checkbox"> 확인했습니다.</label></article></div><div class="consent-fixed-actions"><button id="acceptConsentBtn" class="primary-button" type="button">동의하고 학습 시작</button><p id="consentMessage" class="form-message"></p></div></section></div>
+<div id="quickSearchOverlay" class="quick-search-overlay hidden"><section class="quick-search-modal"><button id="quickSearchClose" class="icon-close" type="button">×</button><p class="eyebrow">빠른 검색</p><input id="quickSearchInput" type="search" placeholder="과정명, 카테고리, 설명 검색"><div id="quickSearchResults" class="quick-search-results"></div></section></div><div id="dashboardToast" class="dashboard-toast hidden"></div>
+<script src="./src/js/config.js"></script><script src="./src/js/storage.js"></script><script src="./src/js/dashboard.js"></script>
+</body></html>
