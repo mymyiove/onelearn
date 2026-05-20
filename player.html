@@ -136,7 +136,8 @@
         <div id="playerStage" class="player-stage controls-visible">
           <div id="videoWrap" class="video-wrap" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다." data-guide="4">
             <span class="guide-badge">④</span>
-            <video id="video" preload="metadata" playsinline></video>
+
+            <video id="video" preload="metadata" playsinline webkit-playsinline></video>
 
             <button id="completeOverlayClose" class="overlay-close hidden" type="button" aria-label="완료 안내 닫기">×</button>
 
@@ -211,8 +212,8 @@
     </section>
   </main>
 
-  <div id="usageOverlay" class="notice-overlay hidden">
-    <section class="notice-modal usage-modal">
+  <div id="usageOverlay" class="usage-overlay hidden">
+    <section class="usage-panel">
       <button id="usageCloseBtn" class="icon-close" type="button" aria-label="사용법 닫기">×</button>
       <div class="modal-icon">🎮</div>
       <p class="eyebrow">OneLearn 플레이어 사용법</p>
