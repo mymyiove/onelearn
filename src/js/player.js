@@ -102,6 +102,7 @@ let controlsTimer = null;
 let clickTimer = null;
 let tooltipTimer = null;
 let previousVolume = 1;
+let lastCompletedLogChapterId = null;
 
 function finishLoading() {
   if (!els.loader) return;
@@ -162,7 +163,16 @@ function remainText(dateString) {
 }
 
 function isTouchDevice() {
-  return window.matchMedia('(pointer: coarse)').matches || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return (
+    window.matchMedia('(pointer: coarse)').matches ||
+    window.matchMedia('(hover: none)').matches ||
+    /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  );
+}
+
+function isIOS() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 function pol(chapter) {
@@ -269,6 +279,7 @@ async function init() {
     select(0);
     updateSoundIcon();
     setupTooltips();
+    updateFullscreenButtons();
     logEvent('player_open');
   } catch (error) {
     console.error('[OneLearn Player] init failed:', error);
@@ -402,6 +413,7 @@ function select(nextIndex) {
   current = chapters[idx];
   identityShown = false;
   lastTickAt = null;
+  lastCompletedLogChapterId = null;
 
   els.chapterTitle.textContent = current.title;
   els.chapterDesc.textContent = current.description || '';
@@ -490,14 +502,18 @@ function update() {
   chapterState.updatedAt = new Date().toISOString();
 
   if (complete(current)) {
+    const wasCompleted = chapterState.completed;
     chapterState.completed = true;
+
+    if (!wasCompleted && lastCompletedLogChapterId !== current.chapterId) {
+      logEvent('chapter_completed');
+      lastCompletedLogChapterId = current.chapterId;
+    }
 
     if (!els.overlay.classList.contains('dismissed')) {
       els.overlay.classList.remove('hidden');
       els.overlayClose.classList.remove('hidden');
     }
-
-    logEvent('chapter_completed');
   }
 
   save();
@@ -556,21 +572,58 @@ function showControls() {
 
   clearTimeout(controlsTimer);
 
-  if (document.fullscreenElement === els.stage && !els.video.paused) {
+  if (isStageFullscreen() && !els.video.paused) {
     controlsTimer = setTimeout(() => {
       els.stage.classList.remove('controls-visible');
     }, 2800);
   }
 }
 
+function isStageFullscreen() {
+  return document.fullscreenElement === els.stage ||
+    document.webkitFullscreenElement === els.stage ||
+    document.fullscreenElement === els.video ||
+    document.webkitFullscreenElement === els.video;
+}
+
 function toggleFullscreen() {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
     return;
   }
 
   if (els.stage.requestFullscreen) {
     els.stage.requestFullscreen();
+    return;
+  }
+
+  if (els.stage.webkitRequestFullscreen) {
+    els.stage.webkitRequestFullscreen();
+    return;
+  }
+
+  if (els.video.webkitEnterFullscreen && isIOS()) {
+    els.video.webkitEnterFullscreen();
+  }
+}
+
+function updateFullscreenButtons() {
+  const fullscreen = isStageFullscreen();
+  const shouldShowRotate = fullscreen && isTouchDevice();
+
+  els.full.textContent = fullscreen ? '⛌' : '⛶';
+  els.full.setAttribute('aria-label', fullscreen ? '전체화면 종료' : '전체화면');
+
+  if (shouldShowRotate) {
+    els.rotate.classList.add('fullscreen-mobile');
+    els.rotate.classList.remove('hidden');
+  } else {
+    els.rotate.classList.remove('fullscreen-mobile');
+    els.rotate.classList.add('hidden');
   }
 }
 
@@ -852,22 +905,33 @@ els.full.onclick = () => {
 
 els.rotate.onclick = async () => {
   try {
-    if (!document.fullscreenElement && els.stage.requestFullscreen) {
-      await els.stage.requestFullscreen();
+    if (!isStageFullscreen()) {
+      if (els.stage.requestFullscreen) {
+        await els.stage.requestFullscreen();
+      } else if (els.stage.webkitRequestFullscreen) {
+        await els.stage.webkitRequestFullscreen();
+      }
     }
 
     const type = screen.orientation?.type || '';
 
-    if (type.includes('landscape')) {
-      await screen.orientation.lock('portrait');
-      logEvent('orientation_lock', { orientation: 'portrait' });
+    if (screen.orientation?.lock) {
+      if (type.includes('landscape')) {
+        await screen.orientation.lock('portrait');
+        logEvent('orientation_lock', { orientation: 'portrait' });
+      } else {
+        await screen.orientation.lock('landscape');
+        logEvent('orientation_lock', { orientation: 'landscape' });
+      }
     } else {
-      await screen.orientation.lock('landscape');
-      logEvent('orientation_lock', { orientation: 'landscape' });
+      logEvent('orientation_lock_unavailable');
     }
   } catch (error) {
     console.log('orientation lock unavailable', error);
     logEvent('orientation_lock_failed');
+  } finally {
+    showControls();
+    updateFullscreenButtons();
   }
 };
 
@@ -941,18 +1005,36 @@ els.confirmOk.onclick = () => {
   pendingMove = null;
 };
 
-document.addEventListener('fullscreenchange', () => {
-  const isFullscreen = document.fullscreenElement === els.stage;
+function onFullscreenChange() {
+  const fullscreen = isStageFullscreen();
 
   showControls();
+  updateFullscreenButtons();
 
-  els.full.textContent = isFullscreen ? '⤢' : '⛶';
-  els.full.setAttribute('aria-label', isFullscreen ? '전체화면 종료' : '전체화면');
+  logEvent(fullscreen ? 'fullscreen_enter' : 'fullscreen_exit');
+}
 
-  els.rotate.classList.toggle('fullscreen-mobile', isFullscreen && isTouchDevice());
-  els.rotate.classList.toggle('hidden', !(isFullscreen && isTouchDevice()));
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
-  logEvent(isFullscreen ? 'fullscreen_enter' : 'fullscreen_exit');
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    showControls();
+    updateFullscreenButtons();
+  }, 250);
+});
+
+screen.orientation?.addEventListener?.('change', () => {
+  setTimeout(() => {
+    showControls();
+    updateFullscreenButtons();
+  }, 250);
+});
+
+window.addEventListener('resize', () => {
+  setTimeout(() => {
+    updateFullscreenButtons();
+  }, 150);
 });
 
 document.addEventListener('visibilitychange', () => {
