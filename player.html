@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="./src/css/common.css">
   <link rel="stylesheet" href="./src/css/player.css">
 </head>
-<body>
+<body class="onelearn-player-page">
   <div class="ambient-bg" aria-hidden="true"><span>🎓</span><span>🚀</span><span>🌱</span><span>✨</span></div>
 
   <div id="playerLoader" class="player-loader" aria-live="polite">
@@ -23,9 +23,7 @@
 
   <header class="site-header player-header">
     <div class="header-inner player-header-inner">
-      <a class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장으로 이동">
-        <span>OneLearn</span><span class="brand-dot"></span>
-      </a>
+      <a id="brandHomeLink" class="brand-text" href="./dashboard.html?tenant=woongjin" aria-label="OneLearn 학습장으로 이동"><span>OneLearn</span><span class="brand-dot"></span></a>
       <div class="header-spacer"></div>
       <div class="player-user">
         <strong id="welcomeText" data-tip="현재 로그인한 학습자와 기업 정보입니다.">확인 중입니다</strong>
@@ -43,15 +41,11 @@
           <h1 id="courseTitle" data-tip="과정명입니다. 현재 수강 중인 강의의 전체 제목입니다.">과정을 불러오는 중입니다</h1>
           <div id="coursePolicyChips" class="course-policy-chips" aria-label="과정 주요 조건" data-tip="마감일과 수료 조건을 배지로 보여줍니다. 마감일은 항상 가장 앞에 표시됩니다."></div>
         </div>
-        <button id="courseDetailToggle" class="soft-button course-detail-toggle" type="button" data-tip="과정 설명, 강사, 마감일, 완료 기준을 확인합니다.">
-          <span id="courseDetailToggleText">자세히</span><span class="toggle-chevron">▾</span>
-        </button>
+        <button id="courseDetailToggle" class="soft-button course-detail-toggle" type="button" aria-expanded="false" data-tip="과정 설명, 강사, 마감일, 완료 기준을 확인합니다."><span id="courseDetailToggleText">자세히</span><span class="toggle-chevron">▾</span></button>
       </div>
 
-      <div id="courseDetailPanel" class="course-detail-panel hidden">
-        <div id="courseThumbnailBox" class="course-thumbnail-box" data-tip="과정 썸네일 영역입니다. 썸네일이 없으면 기본 이미지가 표시됩니다.">
-          <div class="course-thumbnail-fallback"><span>OneLearn</span><strong>Learning Course</strong></div>
-        </div>
+      <div id="courseDetailPanel" class="course-detail-panel detail-collapsed">
+        <div id="courseThumbnailBox" class="course-thumbnail-box" data-tip="과정 썸네일 영역입니다. 썸네일이 없으면 기본 이미지가 표시됩니다."><div class="course-thumbnail-fallback"><span>OneLearn</span><strong>Learning Course</strong></div></div>
         <div class="course-detail-content">
           <p id="courseDesc" data-tip="과정 설명입니다. 이 과정에서 학습할 내용을 요약합니다.">학습 기록과 수료 조건을 확인하고 있습니다.</p>
           <div class="course-extra-grid">
@@ -78,12 +72,7 @@
       </aside>
 
       <section class="video-panel glass-card">
-        <div class="video-top" data-guide="3">
-          <span class="guide-badge">③</span>
-          <h2 id="chapterTitle" data-tip="현재 재생 중인 챕터 제목입니다.">챕터를 선택해주세요</h2>
-          <p id="chapterDesc" data-tip="현재 챕터의 학습 설명입니다.">학습할 챕터 정보를 불러오는 중입니다.</p>
-        </div>
-
+        <div class="video-top" data-guide="3"><span class="guide-badge">③</span><h2 id="chapterTitle" data-tip="현재 재생 중인 챕터 제목입니다.">챕터를 선택해주세요</h2><p id="chapterDesc" data-tip="현재 챕터의 학습 설명입니다.">학습할 챕터 정보를 불러오는 중입니다.</p></div>
         <div id="playerStage" class="player-stage controls-visible">
           <div id="videoWrap" class="video-wrap" data-guide="4" data-tip="영상 영역입니다. 한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.">
             <span class="guide-badge">④</span>
@@ -92,90 +81,29 @@
             <div id="videoCenterHint" class="video-center-hint" aria-hidden="true">▶</div>
             <div id="videoOverlay" class="video-overlay hidden"><strong>✅ 챕터 학습 조건을 충족했습니다</strong><p>오른쪽 위 X를 누르면 다시 볼 수 있습니다.</p></div>
           </div>
-
           <div class="player-controls">
-            <div class="player-meta-row">
-              <strong id="timeText" data-tip="현재 재생 시간, 전체 길이, 챕터 완료율입니다.">00:00 / 00:00 · 0%</strong>
-              <div class="chapter-inline-nav" aria-label="챕터 이동" data-tip="이전 또는 다음 챕터로 이동합니다.">
-                <button id="prevChapterControl" type="button" aria-label="이전 챕터">‹</button>
-                <span id="chapterIndexText">1 / 1</span>
-                <button id="nextChapterControl" type="button" aria-label="다음 챕터">›</button>
-              </div>
-            </div>
-            <div id="timeline" class="timeline" aria-label="영상 진행률" data-guide="5" data-tip="진한 영역은 현재 재생 위치, 옅은 영역은 학습으로 인정되어 다시 이동 가능한 최대 위치입니다.">
-              <span class="guide-badge">⑤</span><span id="timelineAllowed" class="timeline-allowed"></span><span id="timelineFill" class="timeline-fill"></span>
-            </div>
-            <div class="control-bar" aria-label="영상 컨트롤" data-guide="6">
-              <span class="guide-badge">⑥</span>
-              <div class="control-left">
-                <button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지" data-tip="재생 또는 일시정지합니다. 단축키: Space">▶</button>
-                <label class="rate-select" aria-label="재생 속도" data-tip="재생 속도를 조절합니다. 과정 정책에 따라 제한될 수 있습니다.">
-                  <select id="rateSelect"><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select>
-                </label>
-                <button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기" data-tip="자막을 켜거나 끕니다. 단축키: C">CC</button>
-              </div>
-              <div class="control-right">
-                <button id="muteBtn" class="control-button icon-control sound-button" type="button" aria-label="음소거 또는 음소거 해제" data-tip="음소거를 켜거나 끕니다. 단축키: M">🔊</button>
-                <label class="volume-control" aria-label="음량 조절" data-tip="음량을 조절합니다. 0으로 내리면 음소거됩니다. 단축키: ↑ / ↓"><input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1"></label>
-                <button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환" data-tip="모바일 전체화면에서 화면 방향 전환을 시도합니다.">↻</button>
-                <button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면" data-tip="전체화면으로 전환합니다. 단축키: F">⛶</button>
-              </div>
+            <div class="player-meta-row"><strong id="timeText" data-tip="현재 재생 시간, 전체 길이, 챕터 완료율입니다.">00:00 / 00:00 · 0%</strong><div class="chapter-inline-nav" aria-label="챕터 이동" data-tip="이전 또는 다음 챕터로 이동합니다."><button id="prevChapterControl" type="button" aria-label="이전 챕터">‹</button><span id="chapterIndexText">1 / 1</span><button id="nextChapterControl" type="button" aria-label="다음 챕터">›</button></div></div>
+            <div id="timeline" class="timeline" aria-label="영상 진행률" data-guide="5" data-tip="진한 영역은 현재 재생 위치, 옅은 영역은 학습으로 인정되어 다시 이동 가능한 최대 위치입니다."><span class="guide-badge">⑤</span><span id="timelineAllowed" class="timeline-allowed"></span><span id="timelineFill" class="timeline-fill"></span></div>
+            <div class="control-bar" aria-label="영상 컨트롤" data-guide="6"><span class="guide-badge">⑥</span>
+              <div class="control-left"><button id="playBtn" class="primary-button play-control" type="button" aria-label="재생 또는 일시정지" data-tip="재생 또는 일시정지합니다. 단축키: Space">▶</button><label class="rate-select" aria-label="재생 속도" data-tip="재생 속도를 조절합니다. 과정 정책에 따라 제한될 수 있습니다."><select id="rateSelect"><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label><button id="ccBtn" class="control-button icon-control" type="button" aria-label="자막 켜기 또는 끄기" data-tip="자막을 켜거나 끕니다. 단축키: C">CC</button></div>
+              <div class="control-right"><button id="muteBtn" class="control-button icon-control sound-button" type="button" aria-label="음소거 또는 음소거 해제" data-tip="음소거를 켜거나 끕니다. 단축키: M">🔊</button><label class="volume-control" aria-label="음량 조절" data-tip="음량을 조절합니다. 0으로 내리면 음소거됩니다. 단축키: ↑ / ↓"><input id="volumeInput" type="range" min="0" max="1" step="0.05" value="1"></label><button id="rotateBtn" class="control-button icon-control rotate-btn hidden" type="button" aria-label="화면 방향 전환" data-tip="모바일 전체화면에서 화면 방향 전환을 시도합니다.">↻</button><button id="fullscreenBtn" class="control-button icon-control" type="button" aria-label="전체화면" data-tip="전체화면으로 전환합니다. 단축키: F">⛶</button></div>
             </div>
           </div>
-
-          <div id="fullscreenChapterPrompt" class="fs-chapter-prompt hidden">
-            <strong id="fullscreenConfirmTitle">챕터를 이동할까요?</strong>
-            <p id="fullscreenConfirmText">다음 챕터로 이동합니다.</p>
-            <div><button id="fullscreenConfirmCancel" class="ghost-button" type="button">취소</button><button id="fullscreenConfirmOk" class="primary-button" type="button">이동</button></div>
-          </div>
+          <div id="fullscreenChapterPrompt" class="fs-chapter-prompt hidden"><strong id="fullscreenConfirmTitle">챕터를 이동할까요?</strong><p id="fullscreenConfirmText">다음 챕터로 이동합니다.</p><div><button id="fullscreenConfirmCancel" class="ghost-button" type="button">취소</button><button id="fullscreenConfirmOk" class="primary-button" type="button">이동</button></div></div>
           <div id="playerToast" class="player-toast hidden" role="status"></div>
         </div>
-
-        <p id="playerHint" class="player-hint" data-guide="7">
-          <span class="guide-badge">⑦</span>
-          <span>화면 탭: 재생/일시정지 · 더블탭: 전체화면</span>
-          <span class="player-hint-actions"><button id="usageBtn" class="help-link" type="button">사용법</button><button id="helpBtn" class="help-link" type="button">문제가 있나요?</button></span>
-        </p>
+        <p id="playerHint" class="player-hint" data-guide="7"><span class="guide-badge">⑦</span><span>화면 탭: 재생/일시정지 · 더블탭: 전체화면</span><span class="player-hint-actions"><button id="usageBtn" class="help-link" type="button">사용법</button><button id="helpBtn" class="help-link" type="button">문제가 있나요?</button></span></p>
       </section>
     </section>
   </main>
 
-  <div id="usageOverlay" class="usage-overlay hidden">
-    <section class="usage-panel">
-      <button id="usageCloseBtn" class="icon-close" type="button" aria-label="사용법 닫기">×</button>
-      <div class="modal-icon">🎮</div><p class="eyebrow">OneLearn 플레이어 사용법</p>
-      <h2 id="usageStepTitle">① 과정 정보</h2>
-      <p id="usageStepText">과정명, 마감일, 핵심 수료 조건을 확인합니다.</p>
-      <div class="usage-step-actions"><button id="usagePrevBtn" class="ghost-button" type="button">이전</button><span id="usageStepCount">1 / 7</span><button id="usageNextBtn" class="primary-button" type="button">다음</button></div>
-      <div class="usage-grid">
-        <article><strong>① 과정 정보</strong><p>과정명, 마감일, 핵심 수료 조건을 확인합니다.</p></article>
-        <article><strong>② 챕터와 전체 진행률</strong><p>챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.</p></article>
-        <article><strong>③ 현재 챕터 정보</strong><p>현재 학습 중인 챕터 제목과 설명을 확인합니다.</p></article>
-        <article><strong>④ 영상 영역</strong><p>한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p></article>
-        <article><strong>⑤ 진행바</strong><p>진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.</p></article>
-        <article><strong>⑥ 컨트롤바</strong><p>재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.</p></article>
-        <article><strong>⑦ 사용법과 문제 해결</strong><p>사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.</p></article>
-      </div>
-    </section>
-  </div>
+  <div id="usageOverlay" class="usage-overlay hidden"><section class="usage-panel"><button id="usageCloseBtn" class="icon-close" type="button" aria-label="사용법 닫기">×</button><div class="modal-icon">🎮</div><p class="eyebrow">OneLearn 플레이어 사용법</p><h2 id="usageStepTitle">① 과정 정보</h2><p id="usageStepText">과정명, 마감일, 핵심 수료 조건을 확인합니다.</p><div class="usage-step-actions"><button id="usagePrevBtn" class="ghost-button" type="button">이전</button><span id="usageStepCount">1 / 7</span><button id="usageNextBtn" class="primary-button" type="button">다음</button></div><div class="usage-grid"><article><strong>① 과정 정보</strong><p>과정명, 마감일, 핵심 수료 조건을 확인합니다.</p></article><article><strong>② 챕터와 전체 진행률</strong><p>챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.</p></article><article><strong>③ 현재 챕터 정보</strong><p>현재 학습 중인 챕터 제목과 설명을 확인합니다.</p></article><article><strong>④ 영상 영역</strong><p>한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.</p></article><article><strong>⑤ 진행바</strong><p>진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.</p></article><article><strong>⑥ 컨트롤바</strong><p>재생, 배속, 자막, 음소거, 음량, 화면 회전, 전체화면을 조절합니다.</p></article><article><strong>⑦ 사용법과 문제 해결</strong><p>사용법은 화면 안내, 문제가 있나요는 재생 문제 해결 가이드입니다.</p></article></div></section></div>
 
-  <div id="helpOverlay" class="notice-overlay hidden">
-    <section class="notice-modal help-modal">
-      <button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button>
-      <div class="modal-icon">🛠️</div><p class="eyebrow">재생 문제 해결 가이드</p><h2>재생에 문제가 있나요?</h2>
-      <ol><li>최신 Chrome 또는 Edge 사용을 권장합니다.</li><li>사내망, VPN, 보안 프로그램이 영상 도메인을 차단할 수 있습니다.</li><li>브라우저 새로고침 후 다시 재생해보세요.</li><li>브라우저 탭 음소거, OS 볼륨, 이어폰/스피커 연결 상태를 확인하세요.</li><li>영상이 끊기면 다른 탭/프로그램을 종료하고 네트워크를 확인하세요.</li><li>전체화면이 안 되면 브라우저 권한 또는 팝업/보안 정책을 확인하세요.</li><li>모바일에서는 저전력 모드, 데이터 절약 모드, 백그라운드 앱을 끄면 안정적입니다.</li><li>계속 문제가 있으면 과정명, 챕터명, 브라우저명, 발생 시간을 함께 전달해주세요.</li></ol>
-      <p>위 가이드로도 해결이 안 되면 <strong>jhj11@wjthinkbig.com</strong> 으로 메일 주세요.</p>
-    </section>
-  </div>
-
+  <div id="helpOverlay" class="notice-overlay hidden"><section class="notice-modal help-modal"><button id="helpCloseBtn" class="icon-close" type="button" aria-label="도움말 닫기">×</button><div class="modal-icon">🛠️</div><p class="eyebrow">재생 문제 해결 가이드</p><h2>재생에 문제가 있나요?</h2><ol><li>최신 Chrome 또는 Edge 사용을 권장합니다.</li><li>사내망, VPN, 보안 프로그램이 영상 도메인을 차단할 수 있습니다.</li><li>브라우저 새로고침 후 다시 재생해보세요.</li><li>브라우저 탭 음소거, OS 볼륨, 이어폰/스피커 연결 상태를 확인하세요.</li><li>영상이 끊기면 다른 탭/프로그램을 종료하고 네트워크를 확인하세요.</li><li>전체화면이 안 되면 브라우저 권한 또는 팝업/보안 정책을 확인하세요.</li><li>모바일에서는 저전력 모드, 데이터 절약 모드, 백그라운드 앱을 끄면 안정적입니다.</li><li>계속 문제가 있으면 과정명, 챕터명, 브라우저명, 발생 시간을 함께 전달해주세요.</li></ol><p>위 가이드로도 해결이 안 되면 <strong>jhj11@wjthinkbig.com</strong> 으로 메일 주세요.</p></section></div>
   <div id="confirmOverlay" class="confirm-overlay hidden"><section class="confirm-box"><h2>챕터를 이동할까요?</h2><p id="confirmText">다음 챕터로 이동합니다.</p><div><button id="confirmCancel" class="ghost-button" type="button">취소</button><button id="confirmOk" class="primary-button" type="button">이동</button></div></section></div>
-
   <div id="identityModal" class="identity-modal hidden"><section class="identity-box"><div class="identity-icon">🧑‍💻</div><h2>본인 확인이 필요합니다</h2><p>확인 후 자동으로 이어서 재생됩니다.</p><div id="identityCode" class="identity-code">LEARN</div><input id="identityInput" placeholder="위 문구 입력"><button id="identitySubmitBtn" class="primary-button" type="button">확인 완료</button><p id="identityMessage" class="form-message"></p></section></div>
-
   <footer class="site-footer player-footer"><div class="footer-inner compact"><a href="https://wjtb.odoo.com" target="_blank" rel="noopener"><img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne"></a><p class="footer-desc">OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>© 2026 Woongjin Thinkbig, Hugh.</p></div></footer>
-
   <div id="onelearnTooltip" class="onelearn-tooltip hidden" role="tooltip"></div>
-
   <script src="./src/js/config.js"></script>
   <script src="./src/js/storage.js"></script>
   <script src="./src/js/player.js"></script>
