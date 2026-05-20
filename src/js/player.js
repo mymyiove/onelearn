@@ -117,10 +117,12 @@ let previousVolume = 1;
 let lastCompletedLogChapterId = null;
 let usageStep = 1;
 let toastTimer = null;
+let drawerWasOpenBeforeUsage = false;
+let drawerOpenedByUsage = false;
 
 const usageSteps = [
   { id: 1, title: '① 과정 정보', text: '과정명, 마감일, 핵심 수료 조건을 확인합니다. 마감일은 항상 가장 앞에 표시됩니다.' },
-  { id: 2, title: '② 챕터와 전체 진행률', text: '챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.' },
+  { id: 2, title: '② 챕터와 전체 진행률', text: '챕터 버튼으로 열리는 화면입니다. 챕터 목록, 전체 진행률, 챕터별 학습률을 확인합니다.' },
   { id: 3, title: '③ 현재 챕터 정보', text: '현재 학습 중인 챕터 제목과 설명을 확인합니다.' },
   { id: 4, title: '④ 영상 영역', text: '한 번 누르면 재생/일시정지, 두 번 누르면 전체화면으로 전환됩니다.' },
   { id: 5, title: '⑤ 진행바', text: '진한 영역은 현재 위치, 옅은 영역은 이미 학습해 다시 이동 가능한 최대 위치입니다.' },
@@ -194,6 +196,10 @@ function isTouchDevice() {
 function isIOS() {
   return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function isMobileLayout() {
+  return window.matchMedia('(max-width:760px)').matches;
 }
 
 function isStageFullscreen() {
@@ -422,7 +428,9 @@ function renderOutline() {
 
         button.onclick = () => {
           requestChapterMove(chapterIndex);
-          els.drawer.classList.remove('open');
+          if (!document.body.classList.contains('usage-on')) {
+            els.drawer.classList.remove('open');
+          }
         };
 
         body.appendChild(button);
@@ -482,7 +490,6 @@ function askMove(nextIndex) {
   if (nextIndex < 0 || nextIndex >= chapters.length || nextIndex === idx) return;
 
   pendingMove = nextIndex;
-
   const text = `${nextIndex + 1}챕터로 이동하시겠습니까?`;
 
   if (isStageFullscreen()) {
@@ -558,7 +565,6 @@ function update() {
   save();
   renderTime();
   renderCourse();
-  renderOutline();
 }
 
 function getPlaybackPolicy() {
@@ -770,6 +776,42 @@ function setUsageStep(step) {
   document.querySelectorAll('[data-guide]').forEach(node => {
     node.classList.toggle('usage-active', Number(node.dataset.guide) === usageStep);
   });
+
+  if (isMobileLayout()) {
+    if (usageStep === 2) {
+      if (!drawerOpenedByUsage) {
+        drawerWasOpenBeforeUsage = els.drawer.classList.contains('open');
+      }
+
+      els.drawer.classList.add('open');
+      drawerOpenedByUsage = true;
+    } else if (drawerOpenedByUsage && !drawerWasOpenBeforeUsage) {
+      els.drawer.classList.remove('open');
+    }
+  }
+}
+
+function closeUsage() {
+  document.body.classList.remove('usage-on');
+  els.usageOverlay.classList.add('hidden');
+
+  document.querySelectorAll('[data-guide]').forEach(node => {
+    node.classList.remove('usage-active');
+  });
+
+  if (drawerOpenedByUsage && !drawerWasOpenBeforeUsage) {
+    els.drawer.classList.remove('open');
+  }
+
+  drawerOpenedByUsage = false;
+  drawerWasOpenBeforeUsage = false;
+}
+
+function pol(chapter) {
+  return {
+    ...(course?.completionPolicy || {}),
+    ...(chapter?.completionPolicy || {})
+  };
 }
 
 els.video.onloadedmetadata = () => {
@@ -969,14 +1011,12 @@ els.rotate.onclick = async () => {
 els.usage.onclick = () => {
   document.body.classList.add('usage-on');
   els.usageOverlay.classList.remove('hidden');
+  drawerWasOpenBeforeUsage = els.drawer.classList.contains('open');
+  drawerOpenedByUsage = false;
   setUsageStep(1);
 };
 
-els.usageClose.onclick = () => {
-  document.body.classList.remove('usage-on');
-  els.usageOverlay.classList.add('hidden');
-};
-
+els.usageClose.onclick = closeUsage;
 els.usagePrev.onclick = () => setUsageStep(usageStep - 1);
 els.usageNext.onclick = () => setUsageStep(usageStep + 1);
 
@@ -1065,7 +1105,13 @@ screen.orientation?.addEventListener?.('change', () => {
 });
 
 window.addEventListener('resize', () => {
-  setTimeout(updateFullscreenButtons, 150);
+  setTimeout(() => {
+    updateFullscreenButtons();
+
+    if (document.body.classList.contains('usage-on')) {
+      setUsageStep(usageStep);
+    }
+  }, 150);
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -1125,8 +1171,7 @@ document.addEventListener('keydown', event => {
   }
 
   if (event.code === 'Escape') {
-    document.body.classList.remove('usage-on');
-    els.usageOverlay.classList.add('hidden');
+    closeUsage();
     els.helpOverlay.classList.add('hidden');
     els.confirm.classList.add('hidden');
     els.fsPrompt.classList.add('hidden');
