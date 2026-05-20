@@ -16,7 +16,7 @@
     <div class="loader-card">
       <div class="loader-orbit" aria-hidden="true"><span>🚀</span><i></i></div>
       <h1>학습장을 준비하고 있어요</h1>
-      <p>학습 현황과 추천 과정을 정리하고 있습니다.</p>
+      <p>학습 현황을 불러오고 있습니다.</p>
     </div>
   </div>
 
@@ -47,8 +47,7 @@
       <div class="section-head dashboard-hero-head">
         <div>
           <div class="hero-badge">✨ <strong id="quoteRotator">배움은 우연히 얻어지는 것이 아니라 열정과 근면으로 얻어진다. - 애비게일 애덤스</strong></div>
-          <h1 id="dashboardTitle">오늘의 학습을 이어가세요</h1>
-          <p id="dashboardSubtitle">마감과 진행률을 한눈에 확인하고, 가장 중요한 과정부터 빠르게 시작할 수 있습니다.</p>
+          <h1 id="dashboardTitle">오늘도 조금 더 성장해볼까요?</h1>
         </div>
         <div class="hero-pulse" aria-label="전체 학습 진행률">
           <div id="heroProgressRing" class="hero-ring" style="--p:0deg"><strong id="heroProgressText">0%</strong></div>
@@ -57,17 +56,16 @@
       </div>
 
       <section id="summaryGrid" class="summary-grid" aria-label="학습 요약">
-        <article class="summary-card clickable active" data-filter="all"><span>📚</span><b>추천 과정</b><strong id="totalCount">0</strong><small id="totalHint">전체 과정</small></article>
-        <article class="summary-card clickable" data-filter="progress"><span>🚀</span><b>진행 중</b><strong id="inProgressCount">0</strong><small>이어볼 과정</small></article>
-        <article class="summary-card clickable success" data-filter="completed"><span>🏅</span><b>수료 완료</b><strong id="completedCount">0</strong><small>완료 과정</small></article>
-        <article class="summary-card clickable warning" data-filter="urgent"><span>🔥</span><b>마감 임박</b><strong id="urgentCount">0</strong><small>7일 이내</small></article>
+        <article class="summary-card clickable active" data-filter="all"><span>📚</span><b>추천 과정</b><strong id="totalCount">0</strong></article>
+        <article class="summary-card clickable" data-filter="progress"><span>🚀</span><b>진행 중</b><strong id="inProgressCount">0</strong></article>
+        <article class="summary-card clickable success" data-filter="completed"><span>🏅</span><b>수료 완료</b><strong id="completedCount">0</strong></article>
+        <article class="summary-card clickable warning" data-filter="urgent"><span>🔥</span><b>마감 임박</b><strong id="urgentCount">0</strong></article>
       </section>
     </section>
 
     <section class="hero-section">
       <div class="hero-copy glass-card">
         <div class="hero-copy-top">
-          <p class="eyebrow">맞춤 학습 큐레이션</p>
           <h2>추천 과정을 확인하거나<br>학습을 이어서 진행해보세요!</h2>
         </div>
 
@@ -97,7 +95,6 @@
 
     <section class="insight-section glass-card">
       <div class="insight-main">
-        <p class="eyebrow">학습 인사이트</p>
         <h2 id="insightTitle">아직 분석 중입니다</h2>
         <p id="insightText">과정 데이터를 불러오면 우선순위와 추천 행동을 안내합니다.</p>
       </div>
@@ -128,7 +125,12 @@
     <section id="emptyState" class="empty-state hidden">🧐<h2>표시할 과정이 없습니다</h2><p>검색어를 줄이거나 필터를 전체로 바꿔보세요.</p></section>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner compact"><a href="https://wjtb.odoo.com" target="_blank" rel="noopener"><img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne"></a><p class="footer-desc">OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>© 2026 Woongjin Thinkbig, Hugh.</p></div></footer>
+  <footer class="site-footer dashboard-footer">
+    <div class="footer-inner compact dashboard-footer-inner">
+      <a href="https://wjtb.odoo.com" target="_blank" rel="noopener"><img class="footer-logo" src="./src/img/skillone_logo_col_full.png" alt="SkillOne"></a>
+      <p class="footer-desc">OneLearn은 웅진스킬원의 스킬 학습플랫폼 입니다.<br>© 2026 Woongjin Thinkbig, Hugh.</p>
+    </div>
+  </footer>
 
   <div id="noticeOverlay" class="notice-overlay hidden"><section class="notice-modal"><button id="noticeCloseBtn" class="icon-close" type="button" aria-label="공지 닫기">×</button><div class="modal-icon">📢</div><p class="eyebrow">공지사항</p><h2 id="noticeModalTitle">공지</h2><time id="noticeModalDate">-</time><p id="noticeModalBody">-</p></section></div>
 
