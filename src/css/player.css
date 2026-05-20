@@ -24,6 +24,64 @@ body {
   box-shadow: var(--shadow);
 }
 
+button,
+a,
+select,
+input {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease,
+    background-color .18s ease,
+    opacity .18s ease;
+}
+
+button:hover,
+a:hover {
+  transform: translateY(-1px);
+}
+
+button:active,
+a:active {
+  transform: scale(.97);
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(244, 119, 33, .28);
+  outline-offset: 3px;
+}
+
+/* Brand dot glow */
+
+.brand-dot {
+  position: relative;
+  overflow: visible;
+}
+
+.brand-dot::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  z-index: -1;
+  border-radius: 999px;
+  background: rgba(244, 119, 33, .22);
+  animation: brandPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes brandPulse {
+  0%, 100% {
+    transform: scale(.72);
+    opacity: .18;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: .04;
+  }
+}
+
 /* Loader */
 
 .player-loader {
@@ -51,6 +109,7 @@ body {
   background: rgba(255, 255, 255, .82);
   box-shadow: 0 26px 90px rgba(20, 20, 40, .12);
   backdrop-filter: blur(18px);
+  animation: softPop .38s ease both;
 }
 
 .loader-orbit {
@@ -127,6 +186,17 @@ body {
   100% { transform: translateX(260%); }
 }
 
+@keyframes softPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Layout */
 
 .player-shell {
@@ -146,6 +216,21 @@ body {
   position: relative;
   padding: 24px 28px;
   margin-bottom: 16px;
+}
+
+.course-hero,
+.chapter-panel,
+.video-panel {
+  transition: box-shadow .22s ease, border-color .22s ease, transform .22s ease;
+}
+
+@media (hover:hover) {
+  .course-hero:hover,
+  .chapter-panel:hover,
+  .video-panel:hover {
+    border-color: rgba(255,255,255,.9);
+    box-shadow: 0 24px 70px rgba(20,20,40,.09);
+  }
 }
 
 .course-hero-main {
@@ -181,6 +266,7 @@ body {
   font-size: 12px;
   font-weight: 850;
   white-space: nowrap;
+  animation: chipIn .22s ease both;
 }
 
 .course-policy-chip.deadline {
@@ -188,6 +274,17 @@ body {
   border-color: transparent;
   color: #fff;
   box-shadow: 0 10px 24px rgba(244, 119, 33, .18);
+}
+
+@keyframes chipIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .course-detail-toggle {
@@ -214,6 +311,21 @@ body {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
   gap: 18px;
+}
+
+.course-detail-panel:not(.hidden) {
+  animation: revealDown .26s ease both;
+}
+
+@keyframes revealDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .course-thumbnail-box {
@@ -375,6 +487,7 @@ body {
   display: block;
   height: 100%;
   background: var(--brand);
+  transition: width .28s ease;
 }
 
 .drawer-progress p {
@@ -419,7 +532,7 @@ body {
   background: #f4f5f8;
   color: #596174;
   font-size: 13px;
-  transition: transform .2s ease;
+  transition: transform .22s ease;
 }
 
 .outline-section.collapsed .outline-body {
@@ -436,6 +549,10 @@ body {
   padding: 11px;
 }
 
+.outline-body:not(.hidden) {
+  animation: revealDown .22s ease both;
+}
+
 .chapter-button {
   width: 100%;
   text-align: left;
@@ -445,7 +562,11 @@ body {
   padding: 12px;
   font-weight: 650;
   font-size: 13px;
-  transition: .18s ease;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease;
+}
+
+.chapter-button:hover {
+  transform: translateY(-1px);
 }
 
 .chapter-button.active {
@@ -540,6 +661,7 @@ video {
   background: rgba(8, 10, 15, .68);
   color: #fff;
   padding: 24px;
+  animation: fadeIn .22s ease both;
 }
 
 .video-overlay.dismissed {
@@ -567,6 +689,11 @@ video {
 .video-center-hint.show {
   opacity: 1;
   transform: scale(1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Controls */
@@ -636,6 +763,11 @@ video {
   background: #ececf3;
   overflow: hidden;
   cursor: pointer;
+  transition: height .18s ease;
+}
+
+.timeline:hover {
+  height: 12px;
 }
 
 .timeline-allowed,
@@ -646,6 +778,7 @@ video {
   height: 100%;
   border-radius: 999px;
   width: 0;
+  transition: width .2s linear;
 }
 
 .timeline-allowed {
@@ -764,7 +897,7 @@ video {
   white-space: nowrap;
 }
 
-/* Fullscreen prompt */
+/* Fullscreen prompt / toast */
 
 .fs-chapter-prompt {
   position: absolute;
@@ -779,6 +912,18 @@ video {
   border: 1px solid rgba(255,255,255,.78);
   box-shadow: 0 24px 80px rgba(8,10,15,.22);
   text-align: center;
+  animation: promptIn .2s ease both;
+}
+
+@keyframes promptIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 .fs-chapter-prompt strong {
@@ -813,6 +958,18 @@ video {
   font-size: 13px;
   font-weight: 800;
   box-shadow: 0 18px 50px rgba(8,10,15,.2);
+  animation: toastIn .2s ease both;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 /* Guide */
@@ -826,6 +983,7 @@ body.usage-on [data-guide].usage-active {
   z-index: 1500;
   outline: 2px solid rgba(244,119,33,.9);
   outline-offset: 4px;
+  box-shadow: 0 0 0 6px rgba(244,119,33,.10);
 }
 
 body.usage-on [data-guide].usage-active .guide-badge {
@@ -835,15 +993,27 @@ body.usage-on [data-guide].usage-active .guide-badge {
 body.usage-on .guide-badge {
   position: absolute;
   z-index: 1600;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   place-items: center;
   border-radius: 999px;
   background: var(--brand);
   color: #fff;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 950;
   box-shadow: 0 12px 30px rgba(244,119,33,.25);
+  animation: guidePop .22s ease both;
+}
+
+@keyframes guidePop {
+  from {
+    opacity: 0;
+    transform: scale(.82);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .course-hero > .guide-badge { top: 14px; left: 14px; }
@@ -878,7 +1048,7 @@ body.usage-on .guide-badge {
   inset: 0;
   z-index: 1400;
   pointer-events: none;
-  background: rgba(248,249,252,.16);
+  background: rgba(248,249,252,.12);
 }
 
 .usage-panel {
@@ -896,6 +1066,18 @@ body.usage-on .guide-badge {
   border: 1px solid rgba(255,255,255,.82);
   box-shadow: 0 30px 90px rgba(20,20,40,.16);
   backdrop-filter: blur(14px);
+  animation: panelIn .24s ease both;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .usage-panel .icon-close {
@@ -1030,6 +1212,18 @@ body.usage-on .guide-badge {
   padding: 72px 28px 28px;
   background: linear-gradient(to top, rgba(8,10,15,.78), rgba(8,10,15,.42) 45%, transparent);
   transition: opacity .22s ease, transform .22s ease;
+  animation: controlsIn .22s ease both;
+}
+
+@keyframes controlsIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .player-stage:fullscreen:not(.controls-visible) .player-controls {
@@ -1074,6 +1268,14 @@ body.usage-on .guide-badge {
 
 .player-footer {
   margin-top: auto;
+}
+
+/* Desktop only */
+
+@media(min-width:761px) {
+  #chapterDrawerBtn {
+    display: none !important;
+  }
 }
 
 /* Mobile */
@@ -1326,7 +1528,7 @@ body.usage-on .guide-badge {
     width: min(86vw, 340px);
     max-height: none;
     transform: translateX(-105%);
-    transition: .28s;
+    transition: transform .28s ease;
     border-radius: 0 24px 24px 0;
     padding: 18px;
     background: rgba(255,255,255,.96);
@@ -1335,6 +1537,10 @@ body.usage-on .guide-badge {
   .chapter-panel.open {
     transform: translateX(0);
     box-shadow: 0 0 0 999px rgba(20,20,30,.38), var(--shadow);
+  }
+
+  body.usage-on .chapter-panel.open {
+    z-index: 1600;
   }
 
   .drawer-close {
@@ -1382,9 +1588,10 @@ body.usage-on .guide-badge {
     top: auto;
     bottom: 12px;
     width: auto;
-    max-height: min(36dvh, 260px);
+    max-height: min(34dvh, 240px);
     padding: 16px;
     border-radius: 22px;
+    z-index: 1800;
   }
 
   .usage-grid {
@@ -1435,5 +1642,18 @@ body.usage-on .guide-badge {
 
   .volume-control {
     max-width: 84px;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
   }
 }
