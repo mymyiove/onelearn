@@ -47,12 +47,13 @@ const els = {
 
   time: $('timeText'),
   timeline: $('timeline'),
+  allowed: $('timelineAllowed'),
   fill: $('timelineFill'),
 
   play: $('playBtn'),
   rate: $('rateSelect'),
   volume: $('volumeInput'),
-  volumeState: $('volumeState'),
+  mute: $('muteBtn'),
   cc: $('ccBtn'),
   full: $('fullscreenBtn'),
   rotate: $('rotateBtn'),
@@ -114,8 +115,28 @@ function key() {
   return `progress:${session.userId}:${courseId}`;
 }
 
+function logKey() {
+  return `learning-log:${session.userId}:${courseId}`;
+}
+
 function save() {
   OneLearnStorage.write(key(), progress);
+}
+
+function logEvent(type, payload = {}) {
+  const logs = OneLearnStorage.read(logKey(), []);
+
+  logs.push({
+    type,
+    userId: session.userId,
+    courseId,
+    chapterId: current?.chapterId || null,
+    currentTime: els.video?.currentTime || 0,
+    timestamp: new Date().toISOString(),
+    ...payload
+  });
+
+  OneLearnStorage.write(logKey(), logs.slice(-500));
 }
 
 function fmt(seconds) {
@@ -140,8 +161,8 @@ function remainText(dateString) {
   return `D+${Math.abs(diff)}`;
 }
 
-function isMobile() {
-  return window.matchMedia('(max-width:760px)').matches;
+function isTouchDevice() {
+  return window.matchMedia('(pointer: coarse)').matches || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
 function pol(chapter) {
@@ -228,6 +249,7 @@ async function init() {
     }
 
     const detail = await OneLearnStorage.fetchJson(meta.courseFile);
+
     course = {
       ...meta,
       ...detail
@@ -245,8 +267,9 @@ async function init() {
 
     renderBase();
     select(0);
-    updateVolumeState();
+    updateSoundIcon();
     setupTooltips();
+    logEvent('player_open');
   } catch (error) {
     console.error('[OneLearn Player] init failed:', error);
     alert('과정 정보를 불러오지 못했습니다.');
@@ -395,6 +418,7 @@ function select(nextIndex) {
   renderTime();
   renderOutline();
   showControls();
+  logEvent('chapter_changed', { chapterIndex: idx + 1 });
 }
 
 function askMove(nextIndex) {
@@ -410,9 +434,14 @@ function renderTime() {
   const duration = els.video.duration || chapterState.duration || 0;
   const currentTime = els.video.currentTime || 0;
   const ratio = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const allowedRatio = duration ? Math.min(100, (chapterState.maxAllowedTime / duration) * 100) : 0;
 
   els.time.textContent = `${fmt(currentTime)} / ${fmt(duration)} · ${Math.round(ratio)}%`;
   els.fill.style.width = `${ratio}%`;
+
+  if (els.allowed) {
+    els.allowed.style.width = `${allowedRatio}%`;
+  }
 
   els.prev.disabled = idx <= 0;
   els.next.disabled = idx >= chapters.length - 1;
@@ -467,6 +496,8 @@ function update() {
       els.overlay.classList.remove('hidden');
       els.overlayClose.classList.remove('hidden');
     }
+
+    logEvent('chapter_completed');
   }
 
   save();
@@ -479,6 +510,7 @@ function openId() {
   wasPlaying = !els.video.paused;
   els.identity.classList.remove('hidden');
   els.video.pause();
+  logEvent('identity_check_open');
 }
 
 function closeId() {
@@ -486,6 +518,8 @@ function closeId() {
   save();
 
   els.identity.classList.add('hidden');
+
+  logEvent('identity_check_pass');
 
   if (wasPlaying) {
     setTimeout(() => {
@@ -549,11 +583,18 @@ function pulseCenterHint(icon) {
   }, 420);
 }
 
-function updateVolumeState() {
+function updateSoundIcon() {
   const value = Number(els.volume.value || 0);
 
-  if (els.volumeState) {
-    els.volumeState.textContent = value === 0 || els.video.muted ? '음소거' : `${Math.round(value * 100)}%`;
+  if (els.video.muted || value === 0) {
+    els.mute.textContent = '🔇';
+    els.mute.setAttribute('aria-label', '음소거 해제');
+  } else if (value < 0.5) {
+    els.mute.textContent = '🔉';
+    els.mute.setAttribute('aria-label', '음소거');
+  } else {
+    els.mute.textContent = '🔊';
+    els.mute.setAttribute('aria-label', '음소거');
   }
 }
 
@@ -567,8 +608,9 @@ function toggleMute() {
     els.volume.value = 0;
   }
 
-  updateVolumeState();
+  updateSoundIcon();
   showControls();
+  logEvent('mute_toggled', { muted: els.video.muted });
 }
 
 function seekBy(seconds) {
@@ -580,15 +622,17 @@ function seekBy(seconds) {
 
   if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
     showControls();
+    logEvent('seek_blocked', { target });
     return;
   }
 
   els.video.currentTime = target;
   showControls();
+  logEvent('seek_attempt', { target });
 }
 
 function setupTooltips() {
-  if (!els.tooltip || isMobile()) return;
+  if (!els.tooltip || isTouchDevice()) return;
 
   document.querySelectorAll('[data-tip]').forEach(node => {
     if (node.dataset.tooltipReady === 'true') return;
@@ -627,6 +671,7 @@ function showTooltip(node) {
 
 function hideTooltip() {
   clearTimeout(tooltipTimer);
+
   if (els.tooltip) {
     els.tooltip.classList.add('hidden');
   }
@@ -679,6 +724,7 @@ els.video.onended = () => {
   state(current).completed = true;
   save();
   renderCourse();
+  logEvent('chapter_completed');
 
   if (idx < chapters.length - 1) {
     if (course.playbackPolicy?.autoAdvanceNext) {
@@ -695,11 +741,13 @@ els.video.onended = () => {
 els.video.onplay = () => {
   els.play.textContent = 'Ⅱ';
   showControls();
+  logEvent('video_play');
 };
 
 els.video.onpause = () => {
   els.play.textContent = '▶';
   showControls();
+  logEvent('video_pause');
 };
 
 els.play.onclick = () => {
@@ -741,11 +789,13 @@ els.timeline.onclick = event => {
 
   if (p.preventForwardSeeking && target > chapterState.maxAllowedTime + 1.5 && !chapterState.completed) {
     showControls();
+    logEvent('seek_blocked', { target });
     return;
   }
 
   els.video.currentTime = target;
   showControls();
+  logEvent('seek_attempt', { target });
 };
 
 els.rate.onchange = () => {
@@ -766,7 +816,9 @@ els.rate.onchange = () => {
 
   els.rate.value = String(safeRate);
   els.video.playbackRate = safeRate;
+
   showControls();
+  logEvent('rate_changed', { rate: safeRate });
 };
 
 els.volume.oninput = () => {
@@ -779,13 +831,19 @@ els.volume.oninput = () => {
     previousVolume = value;
   }
 
-  updateVolumeState();
+  updateSoundIcon();
   showControls();
+  logEvent('volume_changed', { volume: value });
+};
+
+els.mute.onclick = () => {
+  toggleMute();
 };
 
 els.cc.onclick = () => {
   els.cc.classList.toggle('cc-on');
   showControls();
+  logEvent('caption_toggled', { on: els.cc.classList.contains('cc-on') });
 };
 
 els.full.onclick = () => {
@@ -802,19 +860,24 @@ els.rotate.onclick = async () => {
 
     if (type.includes('landscape')) {
       await screen.orientation.lock('portrait');
+      logEvent('orientation_lock', { orientation: 'portrait' });
     } else {
       await screen.orientation.lock('landscape');
+      logEvent('orientation_lock', { orientation: 'landscape' });
     }
   } catch (error) {
     console.log('orientation lock unavailable', error);
+    logEvent('orientation_lock_failed');
   }
 };
 
 els.usage.onclick = () => {
+  document.body.classList.add('usage-on');
   els.usageOverlay.classList.remove('hidden');
 };
 
 els.usageClose.onclick = () => {
+  document.body.classList.remove('usage-on');
   els.usageOverlay.classList.add('hidden');
 };
 
@@ -886,13 +949,16 @@ document.addEventListener('fullscreenchange', () => {
   els.full.textContent = isFullscreen ? '⤢' : '⛶';
   els.full.setAttribute('aria-label', isFullscreen ? '전체화면 종료' : '전체화면');
 
-  els.rotate.classList.toggle('fullscreen-mobile', isFullscreen && isMobile());
-  els.rotate.classList.toggle('hidden', !(isFullscreen && isMobile()));
+  els.rotate.classList.toggle('fullscreen-mobile', isFullscreen && isTouchDevice());
+  els.rotate.classList.toggle('hidden', !(isFullscreen && isTouchDevice()));
+
+  logEvent(isFullscreen ? 'fullscreen_enter' : 'fullscreen_exit');
 });
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && current && pol(current).pauseWhenHidden) {
     els.video.pause();
+    logEvent('tab_hidden_pause');
   }
 });
 
@@ -956,6 +1022,7 @@ document.addEventListener('keydown', event => {
   }
 
   if (event.code === 'Escape') {
+    document.body.classList.remove('usage-on');
     els.usageOverlay.classList.add('hidden');
     els.helpOverlay.classList.add('hidden');
     els.confirm.classList.add('hidden');
