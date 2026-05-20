@@ -750,6 +750,10 @@ video {
   display: none !important;
 }
 
+.rotate-btn.fullscreen-mobile {
+  display: inline-flex !important;
+}
+
 .player-hint {
   position: relative;
   margin: 11px 0 0;
@@ -782,10 +786,18 @@ video {
   display: none;
 }
 
+body.usage-on [data-guide] {
+  position: relative;
+  z-index: 1500;
+  outline: 2px solid rgba(244, 119, 33, .85);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 9999px rgba(245, 247, 251, .08);
+}
+
 body.usage-on .guide-badge {
   display: grid;
   position: absolute;
-  z-index: 80;
+  z-index: 1600;
   width: 28px;
   height: 28px;
   place-items: center;
@@ -849,6 +861,41 @@ body.usage-on .guide-badge {
   pointer-events: none;
 }
 
+/* Usage overlay */
+
+.usage-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(244,119,33,.10), transparent 24rem),
+    rgba(248, 249, 252, .28);
+}
+
+.usage-panel {
+  position: fixed;
+  right: 24px;
+  top: 88px;
+  z-index: 1700;
+  pointer-events: auto;
+  width: min(460px, calc(100vw - 48px));
+  max-height: calc(100svh - 120px);
+  overflow: auto;
+  padding: 24px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(255,255,255,.8);
+  box-shadow: 0 30px 90px rgba(20,20,40,.16);
+  backdrop-filter: blur(16px);
+}
+
+.usage-panel .icon-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
 /* Modals */
 
 .identity-box {
@@ -875,8 +922,7 @@ body.usage-on .guide-badge {
   padding: 0 14px;
 }
 
-.help-modal,
-.usage-modal {
+.help-modal {
   max-height: 86svh;
   overflow: auto;
 }
@@ -889,7 +935,7 @@ body.usage-on .guide-badge {
 
 .usage-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 16px;
 }
@@ -999,6 +1045,10 @@ body.usage-on .guide-badge {
   background: rgba(255,255,255,.96);
 }
 
+.player-stage:fullscreen .control-right {
+  margin-left: auto;
+}
+
 /* Footer */
 
 .player-footer {
@@ -1041,35 +1091,54 @@ body.usage-on .guide-badge {
     padding: 14px;
     border-radius: 22px;
     margin-bottom: 10px;
+    overflow: hidden;
   }
 
   .course-hero-main {
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "title button"
+      "chips chips";
     gap: 8px;
     align-items: start;
   }
 
+  .course-hero-copy {
+    display: contents;
+  }
+
   .course-hero h1 {
+    grid-area: title;
+    min-width: 0;
     font-size: 22px;
     line-height: 1.12;
+    overflow-wrap: anywhere;
   }
 
   .course-detail-toggle {
+    grid-area: button;
+    align-self: start;
     min-height: 30px;
     padding: 0 10px;
     font-size: 12px;
     border-radius: 999px;
+    white-space: nowrap;
   }
 
   .course-policy-chips {
+    grid-area: chips;
+    width: 100%;
+    min-width: 0;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
-    gap: 5px;
-    margin-top: 9px;
-    padding: 0 0 4px;
+    gap: 6px;
+    margin-top: 0;
+    padding: 0 4px 5px 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 22px), transparent 100%);
   }
 
   .course-policy-chips::-webkit-scrollbar {
@@ -1081,6 +1150,10 @@ body.usage-on .guide-badge {
     min-height: 24px;
     padding: 0 8px;
     font-size: 10.5px;
+  }
+
+  .course-policy-chip.deadline {
+    padding: 0 10px;
   }
 
   .course-detail-panel {
@@ -1267,10 +1340,6 @@ body.usage-on .guide-badge {
     overflow: auto;
   }
 
-  .rotate-btn.fullscreen-mobile {
-    display: inline-flex !important;
-  }
-
   .player-stage:fullscreen .player-controls {
     padding: 76px 14px 18px;
   }
@@ -1281,8 +1350,23 @@ body.usage-on .guide-badge {
     width: calc(100vw - 28px);
   }
 
+  .usage-panel {
+    left: 12px;
+    right: 12px;
+    top: auto;
+    bottom: 12px;
+    width: auto;
+    max-height: 46svh;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
   .usage-grid {
     grid-template-columns: 1fr;
+  }
+
+  body.usage-on [data-guide] {
+    outline-offset: 3px;
   }
 
   .site-footer.player-footer {
@@ -1303,5 +1387,23 @@ body.usage-on .guide-badge {
   .player-footer .footer-desc {
     font-size: 11px;
     line-height: 1.45;
+  }
+}
+
+@media(max-width:390px) {
+  .course-hero h1 {
+    font-size: 20px;
+  }
+
+  .course-detail-toggle {
+    min-height: 28px;
+    padding: 0 9px;
+    font-size: 11.5px;
+  }
+
+  .course-policy-chip {
+    min-height: 24px;
+    padding: 0 8px;
+    font-size: 10px;
   }
 }
